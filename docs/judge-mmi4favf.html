@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Judge panel</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="judge">
+
+  <header class="navbar">
+    <span class="judge-badge">Judge panel</span>
+
+    <div class="nav-clock">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+      </svg>
+      <span class="num" id="clock">--:--:--</span>
+    </div>
+
+    <a class="nav-btn" href="board.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 20V10M12 20V4M17 20v-7"/>
+      </svg>
+      <span>Scoreboard</span>
+    </a>
+  </header>
+
+  <main class="wrap wrap-wide">
+
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="board" aria-selected="true">Board</button>
+      <button class="tab" role="tab" data-tab="problems" aria-selected="false">
+        Problems <span class="tab-count" id="probCount"></span>
+      </button>
+      <button class="tab" role="tab" data-tab="teams" aria-selected="false">
+        Teams <span class="tab-count" id="teamCount"></span>
+      </button>
+      <button class="tab" role="tab" data-tab="contest" aria-selected="false">Contest</button>
+    </nav>
+
+    <!-- ═════════ BOARD ═════════ -->
+    <div data-panel="board">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Board</h2>
+          <span class="panel-sub" id="source"></span>
+        </div>
+        <div class="board-scroll">
+          <table class="board grid" id="grid"></table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Recent attempts</h2>
+          <span class="panel-sub" id="logCount"></span>
+        </div>
+        <div class="log" id="log"></div>
+      </section>
+    </div>
+
+    <!-- ═════════ PROBLEMS ═════════ -->
+    <div data-panel="problems" hidden>
+      <div class="pgrid">
+
+        <aside class="prob-side">
+          <div class="prob-count">
+            <button type="button" class="icon-btn" id="probMinus" aria-label="Remove the last problem">
+              <svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg>
+            </button>
+            <span><b class="num" id="probN">0</b> problems</span>
+            <button type="button" class="icon-btn" id="probPlus" aria-label="Add a problem at the end">
+              <svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg>
+            </button>
+          </div>
+          <div class="prob-list" id="probList"></div>
+        </aside>
+
+        <section class="prob-editor">
+          <div class="card" id="probEmpty">
+            <div class="empty-line">Pick a problem on the left, or add one.</div>
+          </div>
+
+          <div id="probForm" hidden>
+            <div class="card">
+              <div class="pe-head">
+                <div class="pe-nav">
+                  <button type="button" class="icon-btn" id="probPrev" aria-label="Previous problem">
+                    <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+                  </button>
+                  <span class="pe-letter" id="peLetter">A</span>
+                  <button type="button" class="icon-btn" id="probNext" aria-label="Next problem">
+                    <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+                  </button>
+                </div>
+                <label class="field pe-name">
+                  <span>Name</span>
+                  <input type="text" id="pName" autocomplete="off">
+                </label>
+              </div>
+
+              <div class="form-row form-row-3">
+                <label class="field">
+                  <span>Time limit (s)</span>
+                  <input type="number" id="pTL" min="0.1" step="0.5">
+                </label>
+                <label class="field">
+                  <span>Memory limit (MB)</span>
+                  <input type="number" id="pML" min="16" step="64">
+                </label>
+                <label class="check-row speed-row">
+                  <input type="checkbox" id="pSpeed">
+                  <span><b>⚡ Speed problem</b> — only the first team to solve it gets it</span>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Statement</span>
+                <textarea id="pLegend" rows="6"></textarea>
+              </label>
+              <p class="syntax">
+                <code>**n**</code> bold · <code>a_i</code> subscript · <code>10^5</code> power ·
+                <code>&lt;=</code> ≤ · <code>2*10^5</code> 2·10⁵ · <code>`x`</code> code ·
+                empty line = new paragraph
+              </p>
+
+              <label class="field">
+                <span>Input</span>
+                <textarea id="pInput" rows="4"></textarea>
+              </label>
+
+              <label class="field">
+                <span>Output</span>
+                <textarea id="pOutput" rows="3"></textarea>
+              </label>
+
+              <div class="field">
+                <span>Examples</span>
+                <div id="samplesEdit"></div>
+                <button class="btn ghost small" id="addSample" type="button">Add example</button>
+              </div>
+
+              <label class="field">
+                <span>Notes</span>
+                <textarea id="pNotes" rows="4"></textarea>
+              </label>
+
+              <div class="field">
+                <span>Images</span>
+                <div id="figuresEdit"></div>
+                <button class="btn ghost small" id="addFigure" type="button">Add image</button>
+                <input type="file" id="figureFile" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" hidden>
+                <p class="syntax" style="margin-top:10px">
+                  Put <code>[figure 1]</code> on a line of its own in any box above to show image 1 there.
+                  Images stay hidden with the statement until you reveal the problems.
+                </p>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <span class="form-msg" id="probMsg"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="prob-preview">
+          <div class="preview-label">Preview — what students will see</div>
+          <div class="preview-box">
+            <div class="statement" id="preview"></div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ═════════ TEAMS ═════════ -->
+    <div data-panel="teams" hidden>
+      <section class="panel">
+        <div class="panel-head">
+          <h2 id="formTitle">Add a team</h2>
+        </div>
+        <div class="card" id="teamCard">
+          <label class="field">
+            <span>Team name</span>
+            <input type="text" id="tName" placeholder="Segfault" autocomplete="off">
+          </label>
+          <div class="members-grid" id="memberInputs"></div>
+          <div class="form-actions">
+            <button class="btn" id="saveTeam">Add team</button>
+            <button class="btn ghost" id="cancelEdit" hidden>Cancel</button>
+            <span class="form-msg" id="teamMsg"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Teams</h2>
+          <span class="panel-sub" id="teamSub"></span>
+        </div>
+        <div class="team-list" id="teamList"></div>
+      </section>
+    </div>
+
+    <!-- ═════════ CONTEST ═════════ -->
+    <div data-panel="contest" hidden>
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Contest</h2>
+          <span class="panel-sub" id="savedNote"></span>
+        </div>
+        <div class="card">
+          <label class="field">
+            <span>Title shown to students</span>
+            <input type="text" id="cTitle" autocomplete="off">
+          </label>
+          <div class="form-row">
+            <label class="field">
+              <span>Starts at (your local time)</span>
+              <input type="datetime-local" id="cStart">
+            </label>
+            <label class="field">
+              <span>Length in minutes</span>
+              <input type="number" id="cDuration" min="1">
+            </label>
+            <label class="field">
+              <span>Penalty per rejected attempt</span>
+              <input type="number" id="cPenalty" min="0">
+            </label>
+          </div>
+          <label class="field">
+            <span>Submission endpoint (Cloudflare Worker URL)</span>
+            <input type="text" id="cSubmit" autocomplete="off" spellcheck="false">
+          </label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Visibility</h2>
+        </div>
+        <div class="card">
+          <label class="switch-row">
+            <input type="checkbox" id="cReveal">
+            <span class="switch" aria-hidden="true"></span>
+            <span class="switch-text">
+              <b>Show the problems to students</b>
+              <small id="revealHint"></small>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>End of contest</h2>
+        </div>
+        <div class="card">
+          <label class="switch-row">
+            <input type="checkbox" id="cClosed">
+            <span class="switch" aria-hidden="true"></span>
+            <span class="switch-text">
+              <b>Close the site</b>
+              <small id="closedHint"></small>
+            </span>
+          </label>
+
+          <div class="closed-options">
+            <label class="field">
+              <span>Message on the closing page</span>
+              <textarea id="cClosedMsg" rows="3"
+                placeholder="Thank you to every team that took part. See you in the next round."></textarea>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" id="cPodium">
+              <span>Show the top three teams on the closing page</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Files</h2>
+          <span class="panel-sub" id="fileNote"></span>
+        </div>
+        <div class="card">
+          <div class="danger-row">
+            <div><b>Download a backup</b><span>Everything: problems with full statements, teams, attempts. Keep it private.</span></div>
+            <button class="btn ghost small" id="exportBackup">Download backup</button>
+          </div>
+          <div class="danger-row">
+            <div><b>Download standings.json for the site</b><span>What students may see right now. Statements are left out while the problems are hidden.</span></div>
+            <button class="btn ghost small" id="exportSite">Download for site</button>
+          </div>
+          <div class="danger-row">
+            <div><b>Import a file</b><span>A backup replaces everything. A problem pack replaces the problems only.</span></div>
+            <button class="btn ghost small" id="importBtn">Import…</button>
+            <input type="file" id="importFile" accept=".json,application/json" hidden>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Reset</h2>
+          <span class="panel-sub">These only touch this browser until you publish.</span>
+        </div>
+        <div class="card">
+          <div class="danger-row">
+            <div><b>Clear all attempts</b><span>Keeps teams and problems. Use this after a dry run.</span></div>
+            <button class="btn danger small" id="clearAttempts">Clear attempts</button>
+          </div>
+          <div class="danger-row">
+            <div><b>Start fresh</b><span>Removes every team and every attempt. Problems and settings stay.</span></div>
+            <button class="btn danger small" id="clearAll">Start fresh</button>
+          </div>
+          <div class="danger-row">
+            <div><b>Reload from standings.json</b><span>Throws away this browser's copy and reads the file again.</span></div>
+            <button class="btn ghost small" id="reloadFile">Reload file</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- verdict dialog -->
+  <dialog class="dlg" id="dlg">
+    <form method="dialog">
+      <div class="dlg-head">
+        <div>
+          <div class="dlg-title" id="dlgTitle"></div>
+          <div class="dlg-sub" id="dlgSub"></div>
+        </div>
+        <button class="dlg-x" value="close" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="dlg-body">
+        <label class="field">
+          <span>Submitted at minute</span>
+          <input type="number" id="dlgMinute" min="0">
+        </label>
+        <p class="dlg-hint" id="dlgHint"></p>
+        <div class="verdicts">
+          <button type="button" class="v ac"      data-v="AC"><b>Accepted</b><kbd>A</kbd></button>
+          <button type="button" class="v wa"      data-v="WA"><b>Wrong answer</b><kbd>W</kbd></button>
+          <button type="button" class="v tle"     data-v="TLE"><b>Too slow</b><kbd>T</kbd></button>
+          <button type="button" class="v pending" data-v="PENDING"><b>Judging</b><kbd>P</kbd></button>
+        </div>
+        <div class="dlg-history" id="dlgHistory"></div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="assets/scoring.js"></script>
+  <script src="assets/statement.js"></script>
+  <script>
+    const KEY = "judge-state-v1";
+    const MEMBERS = 5;
+    const LABEL = { AC: "Accepted", WA: "Wrong answer", TLE: "Too slow", PENDING: "Judging" };
+    const KEYS  = { KeyA: "AC", KeyW: "WA", KeyT: "TLE", KeyP: "PENDING" };
+    const $ = id => document.getElementById(id);
+
+    let S = null;          // the whole contest
+    let cur = null;        // open verdict cell: { team, problem }
+    let editingId = null;  // team being edited
+    let selProb = null;    // problem open in the editor
+
+    /* ═══════════ load & save ═══════════ */
+    async function init() {
+      const saved = localStorage.getItem(KEY);
+      if (saved) {
+        S = JSON.parse(saved);
+        $("source").textContent = "Loaded from this browser";
+      } else {
+        const res = await fetch("data/standings.json?t=" + Date.now(), { cache: "no-store" });
+        S = await res.json();
+        $("source").textContent = "Loaded from standings.json";
+      }
+      normalise();
+      save();
+
+      buildMemberInputs();
+      fillContest();
+      if (S.problems.length) selectProblem(S.problems[0].id);
+      redraw();
+      tick();
+    }
+
+    // older data may lack the newer problem fields
+    function normalise() {
+      if (S.contest.revealed == null) S.contest.revealed = false;
+      if (S.contest.closed == null) S.contest.closed = false;
+      if (S.contest.closedMessage == null) S.contest.closedMessage = "";
+      if (S.contest.showPodium == null) S.contest.showPodium = true;
+      S.problems.forEach(p => {
+        if (p.memoryLimit == null) p.memoryLimit = 256;
+        if (p.timeLimit == null) p.timeLimit = 1;
+        ["legend", "input", "output", "notes"].forEach(k => { if (p[k] == null) p[k] = ""; });
+        if (!Array.isArray(p.samples) || !p.samples.length) p.samples = [{ input: "", output: "" }];
+        if (!Array.isArray(p.figures)) p.figures = [];
+      });
+      S.problems.sort((a, b) => a.id.localeCompare(b.id));
+    }
+
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(S));
+    }
+
+    function redraw() {
+      drawGrid();
+      drawLog();
+      drawTeams();
+      drawProblemList();
+      if ($("dlg").open) drawHistory();
+    }
+
+    /* ═══════════ tabs ═══════════ */
+    document.querySelectorAll(".tab").forEach(b =>
+      b.addEventListener("click", () => showTab(b.dataset.tab)));
+
+    function showTab(name) {
+      document.querySelectorAll(".tab").forEach(b =>
+        b.setAttribute("aria-selected", b.dataset.tab === name));
+      document.querySelectorAll("[data-panel]").forEach(p =>
+        p.hidden = p.dataset.panel !== name);
+    }
+
+    /* ═══════════ BOARD: grid ═══════════ */
+    function drawGrid() {
+      const board = buildBoard(S);
+
+      let h = '<thead><tr><th class="rank">#</th><th class="team">Team</th>' +
+              '<th>Solved</th><th>Penalty</th>';
+      S.problems.forEach(p => {
+        h += '<th><span class="plet">' + p.id + '</span>' +
+             (p.speed ? '<span class="psub speed">⚡ first</span>' : '') + '</th>';
+      });
+      h += '</tr></thead><tbody>';
+
+      if (!S.teams.length) {
+        h += '<tr><td colspan="' + (4 + S.problems.length) + '">' +
+             '<div class="empty-line">No teams yet. Add them in the Teams tab.</div></td></tr>';
+      }
+
+      board.rows.forEach(r => {
+        h += '<tr><td class="rank num">' + r.rank + '</td>' +
+             '<td class="team"><div class="team-name">' + esc(r.team.name) + '</div></td>' +
+             '<td class="pts num">' + r.solved + '</td>' +
+             '<td class="pen num">' + r.penalty + '</td>';
+        S.problems.forEach(p => {
+          h += '<td class="cell" data-team="' + r.team.id + '" data-problem="' + p.id + '">' +
+               box(board.cells[r.team.id][p.id]) + '</td>';
+        });
+        h += '</tr>';
+      });
+
+      $("grid").innerHTML = h + '</tbody>';
+    }
+
+    function box(c) {
+      return verdictBox(c, "·");
+    }
+
+    $("grid").addEventListener("click", e => {
+      const td = e.target.closest("td.cell");
+      if (td) openCell(td.dataset.team, td.dataset.problem);
+    });
+
+    /* ═══════════ BOARD: verdict dialog ═══════════ */
+    function openCell(teamId, problemId) {
+      cur = { team: teamId, problem: problemId };
+      const team = S.teams.find(t => t.id === teamId);
+      const prob = S.problems.find(p => p.id === problemId);
+
+      $("dlgTitle").textContent = team.name;
+      $("dlgSub").textContent = problemId + " · " + (prob.name || "Untitled");
+
+      const p = lastPendingIndex();
+      if (p >= 0) {
+        $("dlgMinute").value = S.submissions[p].minute;
+        $("dlgHint").textContent =
+          "Waiting for your verdict on the submission from minute " + S.submissions[p].minute + ".";
+      } else {
+        $("dlgMinute").value = currentMinute();
+        $("dlgHint").textContent = "New attempt.";
+      }
+
+      drawHistory();
+      $("dlg").showModal();
+    }
+
+    function currentMinute() {
+      if (!S.contest.start) return 0;
+      const m = Math.floor((Date.now() - new Date(S.contest.start).getTime()) / 60000);
+      return Math.max(0, Math.min(m, S.contest.durationMinutes));
+    }
+
+    function lastPendingIndex() {
+      for (let i = S.submissions.length - 1; i >= 0; i--) {
+        const s = S.submissions[i];
+        if (s.team === cur.team && s.problem === cur.problem && s.verdict === "PENDING") return i;
+      }
+      return -1;
+    }
+
+    function record(verdict) {
+      const minute = parseInt($("dlgMinute").value, 10);
+      if (isNaN(minute) || minute < 0) { $("dlgMinute").focus(); return; }
+
+      const p = lastPendingIndex();
+      if (verdict !== "PENDING" && p >= 0) {
+        S.submissions[p].verdict = verdict;
+        S.submissions[p].minute = minute;
+      } else {
+        S.submissions.push({ team: cur.team, problem: cur.problem, minute, verdict });
+      }
+      save();
+      redraw();
+      $("dlg").close();
+    }
+
+    document.querySelectorAll(".verdicts .v").forEach(b =>
+      b.addEventListener("click", () => record(b.dataset.v)));
+
+    $("dlg").addEventListener("keydown", e => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const v = KEYS[e.code];
+      if (v) { e.preventDefault(); record(v); }
+    });
+
+    function drawHistory() {
+      const items = S.submissions
+        .map((s, i) => ({ s, i }))
+        .filter(x => x.s.team === cur.team && x.s.problem === cur.problem)
+        .sort((a, b) => a.s.minute - b.s.minute);
+
+      $("dlgHistory").innerHTML = items.length
+        ? '<div class="hist-title">History</div>' + items.map(({ s, i }) => attemptRow(s, i, false)).join("")
+        : '<div class="empty-line">No attempts yet.</div>';
+    }
+
+    /* ═══════════ BOARD: recent attempts ═══════════ */
+    function drawLog() {
+      const n = S.submissions.length;
+      $("logCount").textContent = n ? n + (n === 1 ? " attempt" : " attempts") : "";
+      $("log").innerHTML = n
+        ? S.submissions.map((s, i) => ({ s, i })).reverse().slice(0, 15)
+            .map(({ s, i }) => attemptRow(s, i, true)).join("")
+        : '<div class="empty-line">Nothing recorded yet.</div>';
+    }
+
+    function attemptRow(s, i, withTeam) {
+      const team = S.teams.find(t => t.id === s.team);
+      const who = withTeam
+        ? '<span class="lr-team">' + esc(team ? team.name : "?") + '</span>' +
+          '<span class="lr-prob">' + s.problem + '</span>'
+        : '';
+      return '<div class="lr">' +
+        '<span class="lr-min num">' + s.minute + '′</span>' + who +
+        '<span class="chip ' + s.verdict.toLowerCase() + '">' + LABEL[s.verdict] + '</span>' +
+        '<button type="button" class="lr-del" data-i="' + i + '" aria-label="Remove">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+        '</button></div>';
+    }
+
+    document.addEventListener("click", e => {
+      const b = e.target.closest(".lr-del");
+      if (!b) return;
+      S.submissions.splice(parseInt(b.dataset.i, 10), 1);
+      save();
+      redraw();
+    });
+
+    /* ═══════════ PROBLEMS ═══════════ */
+    function drawProblemList() {
+      $("probCount").textContent = S.problems.length || "";
+      $("probList").innerHTML = S.problems.length
+        ? S.problems.map(p =>
+            '<button class="prob-item" data-pid="' + p.id + '" aria-current="' + (p.id === selProb) + '">' +
+              '<span class="pi-id">' + p.id + '</span>' +
+              '<span class="pi-name">' + esc(p.name || "Untitled") + '</span>' +
+              '<span class="pi-dot' + (hasStatement(p) ? ' on' : '') + '" title="' +
+                (hasStatement(p) ? 'Statement written' : 'Statement missing') + '"></span>' +
+            '</button>').join("")
+        : '<div class="empty-line">No problems yet.</div>';
+      $("probN").textContent = S.problems.length;
+      $("probMinus").disabled = S.problems.length <= 1;
+      $("probPlus").disabled = S.problems.length >= 26;
+    }
+
+    $("probList").addEventListener("click", e => {
+      const b = e.target.closest(".prob-item");
+      if (b) selectProblem(b.dataset.pid);
+    });
+
+    function selProblem() {
+      return S.problems.find(p => p.id === selProb);
+    }
+
+    function selectProblem(id) {
+      selProb = id;
+      const p = selProblem();
+      $("probEmpty").hidden = !!p;
+      $("probForm").hidden = !p;
+      if (!p) { $("preview").innerHTML = ""; drawProblemList(); return; }
+
+      $("peLetter").textContent = p.id;
+      const idx = S.problems.indexOf(p);
+      $("probPrev").disabled = idx <= 0;
+      $("probNext").disabled = idx >= S.problems.length - 1;
+      $("pName").value = p.name || "";
+      $("pSpeed").checked = !!p.speed;
+      $("pTL").value = p.timeLimit;
+      $("pML").value = p.memoryLimit;
+      $("pLegend").value = p.legend;
+      $("pInput").value = p.input;
+      $("pOutput").value = p.output;
+      $("pNotes").value = p.notes;
+      $("probMsg").textContent = "";
+      drawSamples();
+      drawFigures();
+      drawPreview();
+      drawProblemList();
+    }
+
+    const probFields = {
+      pName:   (p, v) => p.name = v,
+      pTL:     (p, v) => p.timeLimit = Math.max(0.1, parseFloat(v) || 1),
+      pML:     (p, v) => p.memoryLimit = Math.max(16, parseInt(v, 10) || 256),
+      pLegend: (p, v) => p.legend = v,
+      pInput:  (p, v) => p.input = v,
+      pOutput: (p, v) => p.output = v,
+      pNotes:  (p, v) => p.notes = v
+    };
+
+    Object.keys(probFields).forEach(id =>
+      $(id).addEventListener("input", e => {
+        const p = selProblem();
+        if (!p) return;
+        probFields[id](p, e.target.value);
+        problemChanged();
+      }));
+
+    // only one problem can be the speed problem
+    $("pSpeed").addEventListener("change", e => {
+      const p = selProblem();
+      if (!p) return;
+      if (e.target.checked) S.problems.forEach(q => { if (q !== p) delete q.speed; });
+      if (e.target.checked) p.speed = true; else delete p.speed;
+      problemChanged();
+    });
+
+    function problemChanged() {
+      save();
+      drawPreview();
+      drawProblemList();
+      drawGrid();
+      const t = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      $("probMsg").className = "form-msg ok";
+      $("probMsg").textContent = "✓ All changes saved in this browser · " + t;
+    }
+
+    function drawPreview() {
+      const p = selProblem();
+      $("preview").innerHTML = p ? renderStatement(p) : "";
+    }
+
+    function drawSamples() {
+      const p = selProblem();
+      $("samplesEdit").innerHTML = p.samples.map((s, i) =>
+        '<div class="sample-edit">' +
+          '<div class="se-head"><span>Example ' + (i + 1) + '</span>' +
+            (p.samples.length > 1
+              ? '<button type="button" class="icon-btn del" data-rm-sample="' + i + '" aria-label="Remove example">' +
+                '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
+              : '') +
+          '</div>' +
+          '<div class="se-cols">' +
+            '<textarea class="mono" rows="4" placeholder="input" data-sample="' + i + '" data-side="input">' +
+              esc(s.input) + '</textarea>' +
+            '<textarea class="mono" rows="4" placeholder="output" data-sample="' + i + '" data-side="output">' +
+              esc(s.output) + '</textarea>' +
+          '</div>' +
+        '</div>').join("");
+    }
+
+    $("samplesEdit").addEventListener("input", e => {
+      const ta = e.target.closest("textarea[data-sample]");
+      if (!ta) return;
+      selProblem().samples[+ta.dataset.sample][ta.dataset.side] = ta.value;
+      problemChanged();
+    });
+
+    $("samplesEdit").addEventListener("click", e => {
+      const b = e.target.closest("[data-rm-sample]");
+      if (!b) return;
+      selProblem().samples.splice(+b.dataset.rmSample, 1);
+      drawSamples();
+      problemChanged();
+    });
+
+    /* ── images ── */
+    function drawFigures() {
+      const p = selProblem();
+      $("figuresEdit").innerHTML = p.figures.map((f, i) =>
+        '<div class="fig-edit">' +
+          '<img src="' + f.src + '" alt="">' +
+          '<div class="fig-main">' +
+            '<div class="fig-tag"><code>[figure ' + (i + 1) + ']</code>' +
+              '<span class="fig-size">' + Math.round(f.src.length * 0.75 / 1024) + ' KB</span></div>' +
+            '<input type="text" class="fig-cap" data-fig="' + i + '" placeholder="Caption (optional)" value="' +
+              esc(f.caption || "") + '">' +
+          '</div>' +
+          '<button type="button" class="icon-btn del" data-rm-fig="' + i + '" aria-label="Remove image ' + (i + 1) + '">' +
+            '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
+        '</div>').join("");
+    }
+
+    $("addFigure").addEventListener("click", () => $("figureFile").click());
+
+    $("figureFile").addEventListener("change", e => {
+      const file = e.target.files[0];
+      e.target.value = "";
+      if (!file) return;
+      if (file.size > 400 * 1024 &&
+          !confirm("This image is " + Math.round(file.size / 1024) + " KB. Big images make the site slow " +
+                   "for students on phones. Add it anyway?")) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const p = selProblem();
+        p.figures.push({ src: reader.result, caption: "" });
+        drawFigures();
+        problemChanged();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    $("figuresEdit").addEventListener("input", e => {
+      const inp = e.target.closest(".fig-cap");
+      if (!inp) return;
+      selProblem().figures[+inp.dataset.fig].caption = inp.value;
+      problemChanged();
+    });
+
+    $("figuresEdit").addEventListener("click", e => {
+      const b = e.target.closest("[data-rm-fig]");
+      if (!b) return;
+      if (!confirm("Remove image " + (+b.dataset.rmFig + 1) + "? Any later [figure N] numbers move up by one.")) return;
+      selProblem().figures.splice(+b.dataset.rmFig, 1);
+      drawFigures();
+      problemChanged();
+    });
+
+    $("addSample").addEventListener("click", () => {
+      const p = selProblem();
+      if (!p) return;
+      p.samples.push({ input: "", output: "" });
+      drawSamples();
+      problemChanged();
+      const boxes = $("samplesEdit").querySelectorAll(".sample-edit");
+      const last = boxes[boxes.length - 1];
+      last.classList.add("just-added");
+      last.scrollIntoView({ behavior: "smooth", block: "center" });
+      last.querySelector("textarea").focus({ preventScroll: true });
+    });
+
+    // + adds the first missing letter (normally the next one at the end).
+    // It does not move you there.
+    $("probPlus").addEventListener("click", () => {
+      if (S.problems.length >= 26) return;
+
+      const used = new Set(S.problems.map(p => p.id));
+      let id = null;
+      for (let c = 65; c <= 90; c++) {
+        const letter = String.fromCharCode(c);
+        if (!used.has(letter)) { id = letter; break; }
+      }
+      if (!id) return;
+
+      S.problems.push({
+        id, name: "", timeLimit: 1, memoryLimit: 256,
+        legend: "", input: "", output: "", samples: [{ input: "", output: "" }], notes: ""
+      });
+      S.problems.sort((a, b) => a.id.localeCompare(b.id));
+      save();
+      redraw();
+      if (!selProb) selectProblem(id);
+
+      const item = document.querySelector('.prob-item[data-pid="' + id + '"]');
+      if (item) item.classList.add("just-added");
+    });
+
+    // − removes the last letter, after asking
+    $("probMinus").addEventListener("click", () => {
+      if (S.problems.length <= 1) return;
+      const p = S.problems[S.problems.length - 1];
+      const tries = S.submissions.filter(s => s.problem === p.id).length;
+      const bits = [];
+      if (hasStatement(p) || p.name) bits.push("its statement");
+      if (tries) bits.push(tries + " recorded attempts");
+      const msg = "Remove problem " + p.id + (p.name ? " (" + p.name + ")" : "") +
+                  (bits.length ? "? This also deletes " + bits.join(" and ") + "." : "?");
+      if (!confirm(msg)) return;
+      S.problems.pop();
+      S.submissions = S.submissions.filter(s => s.problem !== p.id);
+      save();
+      if (selProb === p.id) selectProblem(S.problems[S.problems.length - 1].id);
+      redraw();
+    });
+
+    function stepProblem(delta) {
+      const i = S.problems.findIndex(p => p.id === selProb);
+      const next = S.problems[i + delta];
+      if (!next) return;
+      selectProblem(next.id);
+      const top = document.querySelector(".prob-editor").getBoundingClientRect().top;
+      if (top < 0) window.scrollBy({ top: top - 80, behavior: "smooth" });
+    }
+    $("probPrev").addEventListener("click", () => stepProblem(-1));
+    $("probNext").addEventListener("click", () => stepProblem(1));
+
+    /* ═══════════ TEAMS ═══════════ */
+    function buildMemberInputs() {
+      let h = "";
+      for (let i = 0; i < MEMBERS; i++) {
+        h += '<label class="field"><span>Member ' + (i + 1) + '</span>' +
+             '<input type="text" class="m-input" autocomplete="off"></label>';
+      }
+      $("memberInputs").innerHTML = h;
+    }
+
+    function memberInputs() {
+      return [...document.querySelectorAll(".m-input")];
+    }
+
+    $("saveTeam").addEventListener("click", saveTeam);
+    $("teamCard").addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); saveTeam(); }
+    });
+
+    function saveTeam() {
+      const name = $("tName").value.trim();
+      const members = memberInputs().map(i => i.value.trim()).filter(Boolean);
+
+      if (!name) { teamMsg("err", "Give the team a name."); $("tName").focus(); return; }
+
+      const clash = S.teams.find(t =>
+        t.name.toLowerCase() === name.toLowerCase() && t.id !== editingId);
+      if (clash) { teamMsg("err", "Another team is already called " + name + "."); return; }
+
+      if (editingId) {
+        const t = S.teams.find(t => t.id === editingId);
+        t.name = name;
+        t.members = members;
+        teamMsg("ok", "Saved " + name + ".");
+      } else {
+        S.teams.push({ id: newId(), name, members });
+        teamMsg("ok", "Added " + name + ".");
+      }
+
+      save();
+      resetForm();
+      redraw();
+      $("tName").focus();
+    }
+
+    function newId() {
+      return "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    }
+
+    function resetForm() {
+      editingId = null;
+      $("tName").value = "";
+      memberInputs().forEach(i => i.value = "");
+      $("formTitle").textContent = "Add a team";
+      $("saveTeam").textContent = "Add team";
+      $("cancelEdit").hidden = true;
+    }
+
+    $("cancelEdit").addEventListener("click", () => {
+      resetForm();
+      teamMsg("", "");
+      drawTeams();
+    });
+
+    function teamMsg(kind, text) {
+      $("teamMsg").className = "form-msg " + kind;
+      $("teamMsg").textContent = text;
+    }
+
+    function drawTeams() {
+      const n = S.teams.length;
+      $("teamCount").textContent = n || "";
+      $("teamSub").textContent = n ? n + (n === 1 ? " team" : " teams") : "";
+
+      if (!n) {
+        $("teamList").innerHTML = '<div class="empty-line">No teams yet.</div>';
+        return;
+      }
+
+      $("teamList").innerHTML = S.teams.map(t => {
+        const tries = S.submissions.filter(s => s.team === t.id).length;
+        const members = (t.members || []).length
+          ? esc(t.members.join(", "))
+          : '<i>No members listed</i>';
+        return '<div class="team-row' + (t.id === editingId ? ' editing' : '') + '">' +
+          '<div class="tr-main">' +
+            '<div class="tr-name">' + esc(t.name) + '</div>' +
+            '<div class="tr-members">' + members + '</div>' +
+          '</div>' +
+          '<span class="tr-meta num">' + tries + (tries === 1 ? " attempt" : " attempts") + '</span>' +
+          '<div class="tr-actions">' +
+            '<button class="icon-btn" data-edit="' + t.id + '" aria-label="Edit ' + esc(t.name) + '">' +
+              '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13 7l4 4"/></svg></button>' +
+            '<button class="icon-btn del" data-del="' + t.id + '" aria-label="Remove ' + esc(t.name) + '">' +
+              '<svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button>' +
+          '</div>' +
+        '</div>';
+      }).join("");
+    }
+
+    $("teamList").addEventListener("click", e => {
+      const ed = e.target.closest("[data-edit]");
+      const del = e.target.closest("[data-del]");
+
+      if (ed) {
+        const t = S.teams.find(t => t.id === ed.dataset.edit);
+        editingId = t.id;
+        $("tName").value = t.name;
+        memberInputs().forEach((inp, i) => inp.value = (t.members || [])[i] || "");
+        $("formTitle").textContent = "Edit " + t.name;
+        $("saveTeam").textContent = "Save changes";
+        $("cancelEdit").hidden = false;
+        teamMsg("", "");
+        drawTeams();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        $("tName").focus();
+      }
+
+      if (del) {
+        const t = S.teams.find(t => t.id === del.dataset.del);
+        const tries = S.submissions.filter(s => s.team === t.id).length;
+        const extra = tries ? " and its " + tries + " recorded attempts" : "";
+        if (!confirm("Remove " + t.name + extra + "?")) return;
+        S.teams = S.teams.filter(x => x.id !== t.id);
+        S.submissions = S.submissions.filter(s => s.team !== t.id);
+        if (editingId === t.id) resetForm();
+        save();
+        redraw();
+      }
+    });
+
+    /* ═══════════ CONTEST ═══════════ */
+    function fillContest() {
+      $("cTitle").value = S.contest.title || "";
+      $("cStart").value = toLocalInput(S.contest.start);
+      $("cDuration").value = S.contest.durationMinutes;
+      $("cPenalty").value = S.contest.penaltyPerFail;
+      $("cSubmit").value = S.contest.submitUrl || "";
+      $("cReveal").checked = !!S.contest.revealed;
+      revealHint();
+      $("cClosed").checked = !!S.contest.closed;
+      $("cClosedMsg").value = S.contest.closedMessage || "";
+      $("cPodium").checked = S.contest.showPodium !== false;
+      closedHint();
+    }
+
+    function closedHint() {
+      $("closedHint").textContent = S.contest.closed
+        ? "On — after you publish, every page of the site shows the closing page."
+        : "Off — the site works normally. Turn this on when the contest is over, then publish.";
+    }
+
+    function revealHint() {
+      $("revealHint").textContent = S.contest.revealed
+        ? "On — students see every name and statement once you publish."
+        : "Off — students see letters and points only. Names and statements stay in this browser.";
+    }
+
+    function toLocalInput(iso) {
+      if (!iso) return "";
+      const d = new Date(iso);
+      if (isNaN(d)) return "";
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    }
+
+    const contestFields = {
+      cTitle:    v => S.contest.title = v.trim(),
+      cStart:    v => S.contest.start = v ? new Date(v).toISOString() : null,
+      cDuration: v => S.contest.durationMinutes = Math.max(1, parseInt(v, 10) || 180),
+      cPenalty:  v => S.contest.penaltyPerFail = Math.max(0, parseInt(v, 10) || 0),
+      cSubmit:   v => S.contest.submitUrl = v.trim()
+    };
+
+    Object.keys(contestFields).forEach(id =>
+      $(id).addEventListener("change", e => {
+        contestFields[id](e.target.value);
+        save();
+        redraw();
+        tick();
+        $("savedNote").textContent = "Saved";
+        setTimeout(() => $("savedNote").textContent = "", 1500);
+      }));
+
+    $("cReveal").addEventListener("change", e => {
+      if (e.target.checked) {
+        const missing = S.problems.filter(p => !hasStatement(p)).map(p => p.id);
+        if (missing.length && !confirm("Problem " + missing.join(", ") +
+            " has no full statement yet and will stay locked. Show the problems anyway?")) {
+          e.target.checked = false;
+          return;
+        }
+      }
+      S.contest.revealed = e.target.checked;
+      save();
+      revealHint();
+    });
+
+    $("cClosed").addEventListener("change", e => {
+      if (e.target.checked && !confirm("Close the site? After you publish, students only see the closing page.")) {
+        e.target.checked = false;
+        return;
+      }
+      S.contest.closed = e.target.checked;
+      save();
+      closedHint();
+    });
+    $("cClosedMsg").addEventListener("input", e => { S.contest.closedMessage = e.target.value; save(); });
+    $("cPodium").addEventListener("change", e => { S.contest.showPodium = e.target.checked; save(); });
+
+    // What the public site is allowed to see. Publish will send exactly this.
+    function publicData() {
+      const out = JSON.parse(JSON.stringify(S));
+      out.updatedAt = new Date().toISOString();
+      if (!S.contest.revealed) {
+        out.problems = S.problems.map(p => ({
+          id: p.id, timeLimit: p.timeLimit, memoryLimit: p.memoryLimit
+        }));
+      }
+      return out;
+    }
+
+    function download(name, obj) {
+      const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    function fileNote(text) {
+      $("fileNote").textContent = text;
+      setTimeout(() => $("fileNote").textContent = "", 3000);
+    }
+
+    $("exportBackup").addEventListener("click", () => {
+      const d = new Date();
+      const stamp = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0") + "_" +
+        String(d.getHours()).padStart(2, "0") + String(d.getMinutes()).padStart(2, "0");
+      download("contest-backup_" + stamp + ".json", S);
+      fileNote("Backup downloaded");
+    });
+
+    $("exportSite").addEventListener("click", () => {
+      download("standings.json", publicData());
+      fileNote(S.contest.revealed ? "Downloaded with statements" : "Downloaded without statements");
+    });
+
+    $("importBtn").addEventListener("click", () => $("importFile").click());
+
+    $("importFile").addEventListener("change", async e => {
+      const f = e.target.files[0];
+      e.target.value = "";
+      if (!f) return;
+      let data;
+      try {
+        data = JSON.parse(await f.text());
+      } catch (err) {
+        alert("That file is not valid JSON.");
+        return;
+      }
+      // a problem pack replaces the problems only; teams, attempts and settings stay
+      if (data && data.kind === "problem-pack" && Array.isArray(data.problems)) {
+        const ids = new Set(data.problems.map(p => p.id));
+        const lost = S.submissions.filter(s => !ids.has(s.problem)).length;
+        const msg = "Replace your " + S.problems.length + " problems with the " + data.problems.length +
+          " problems in " + f.name + "?\n\nTeams, attempts and contest settings stay as they are." +
+          (lost ? "\n" + lost + " attempts on problems that are not in the pack will be removed." : "");
+        if (!confirm(msg)) return;
+        S.problems = JSON.parse(JSON.stringify(data.problems));
+        S.submissions = S.submissions.filter(s => ids.has(s.problem));
+        normalise();
+        save();
+        selectProblem(S.problems.length ? S.problems[0].id : null);
+        redraw();
+        fileNote("Imported " + data.problems.length + " problems");
+        return;
+      }
+
+      if (!data || !data.contest || !Array.isArray(data.problems) ||
+          !Array.isArray(data.teams) || !Array.isArray(data.submissions)) {
+        alert("That file does not look like a contest file.");
+        return;
+      }
+      const stripped = data.problems.length && !data.problems.some(p => p.legend);
+      const warn = stripped ? "\n\nThis file has no problem statements in it." : "";
+      if (!confirm("Replace everything in this browser with " + f.name + "?" + warn)) return;
+
+      S = data;
+      normalise();
+      save();
+      resetForm();
+      fillContest();
+      selectProblem(S.problems.length ? S.problems[0].id : null);
+      redraw();
+      tick();
+      fileNote("Imported " + f.name);
+    });
+
+    $("clearAttempts").addEventListener("click", () => {
+      if (!confirm("Delete every recorded attempt? Teams and problems stay.")) return;
+      S.submissions = [];
+      save();
+      redraw();
+    });
+
+    $("clearAll").addEventListener("click", () => {
+      if (!confirm("Remove every team and every attempt?")) return;
+      S.teams = [];
+      S.submissions = [];
+      resetForm();
+      save();
+      redraw();
+    });
+
+    $("reloadFile").addEventListener("click", () => {
+      if (!confirm("Throw away everything in this browser and reload standings.json?")) return;
+      localStorage.removeItem(KEY);
+      location.reload();
+    });
+
+    /* ═══════════ helpers ═══════════ */
+    function esc(s) {
+      return escHtml(s);
+    }
+
+    function hhmmss(t) {
+      const s = Math.max(0, Math.floor(t));
+      return Math.floor(s / 3600) + ":" +
+        String(Math.floor((s % 3600) / 60)).padStart(2, "0") + ":" +
+        String(s % 60).padStart(2, "0");
+    }
+
+    function tick() {
+      if (!S) return;
+      if (!S.contest.start) { $("clock").textContent = "no start time"; return; }
+      const t0 = new Date(S.contest.start).getTime();
+      const t1 = t0 + S.contest.durationMinutes * 60000;
+      const now = Date.now();
+      if (now < t0)      $("clock").textContent = "−" + hhmmss((t0 - now) / 1000);
+      else if (now < t1) $("clock").textContent = hhmmss((t1 - now) / 1000);
+      else               $("clock").textContent = "finished";
+    }
+
+    init();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>

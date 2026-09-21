@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Problem</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <a class="nav-btn" href="index.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 5h11M4 12h11M4 19h11M19 5h1M19 12h1M19 19h1"/>
+      </svg>
+      <span>Problems</span>
+    </a>
+
+    <nav class="letters" id="letters"></nav>
+
+    <a class="nav-btn" href="submit.html" id="submitLink">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6"/>
+      </svg>
+      <span>Submit</span>
+    </a>
+  </header>
+
+  <main class="statement" id="statement">
+    <div class="notice"><p>Loading…</p></div>
+  </main>
+
+  <script src="assets/statement.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const pid = (new URLSearchParams(location.search).get("id") || "A").toUpperCase();
+    let waiting = null;   // polls while the statements are still hidden
+
+    async function load() {
+      let data;
+      try {
+        const res = await fetch("data/standings.json?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        data = await res.json();
+        if (data.contest.closed) { location.replace("closed.html"); return; }
+      } catch (e) {
+        show(notice("Could not load the problems", "Check your connection and refresh the page."));
+        return;
+      }
+
+      const probs = data.problems || [];
+      drawLetters(probs);
+      $("submitLink").href = "submit.html?problem=" + pid;
+
+      const i = probs.findIndex(p => p.id === pid);
+      if (i < 0) {
+        document.title = "No such problem";
+        show(notice("There is no problem " + escHtml(pid),
+          'Go back to the <a href="index.html">problem list</a>.'));
+        return;
+      }
+
+      if (!data.contest.revealed) {
+        document.title = "Problem " + pid;
+        show(locked(data.contest));
+        if (!waiting) waiting = setInterval(load, 20000);
+        return;
+      }
+
+      clearInterval(waiting);
+      waiting = null;
+
+      const p = probs[i];
+      document.title = p.id + ". " + (p.name || "Problem");
+      show(renderStatement(p) + solveCta(p) + pager(probs, i));
+    }
+
+    function show(html) {
+      $("statement").innerHTML = html;
+    }
+
+    function drawLetters(probs) {
+      $("letters").innerHTML = probs.map(p =>
+        '<a href="problem.html?id=' + p.id + '"' +
+        (p.id === pid ? ' aria-current="page"' : '') + '>' + p.id + '</a>').join("");
+    }
+
+    function notice(title, text) {
+      return '<div class="notice"><h1>' + title + '</h1><p>' + text + '</p></div>';
+    }
+
+    function locked(contest) {
+      let when = "";
+      if (contest.start) {
+        const d = new Date(contest.start);
+        when = " The contest starts " + d.toLocaleString([], {
+          weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit"
+        }) + ".";
+      }
+      return '<div class="notice locked">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/>' +
+        '<path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' +
+        '<h1>Problem ' + escHtml(pid) + ' is not open yet</h1>' +
+        '<p>Statements appear the moment the contest begins.' + when + '</p>' +
+        '<p class="small">This page checks by itself. No need to refresh.</p>' +
+      '</div>';
+    }
+
+    function solveCta(p) {
+      return '<a class="solve-cta" href="submit.html?problem=' + p.id + '">' +
+        '<span>Solved it? Send your code for ' + p.id + '</span>' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>';
+    }
+
+    function pager(probs, i) {
+      const link = (p, dir) => !p ? '<span></span>' :
+        '<a class="pg ' + dir + '" href="problem.html?id=' + p.id + '">' +
+          '<small>' + (dir === "prev" ? "Previous" : "Next") + '</small>' +
+          '<b>' + p.id + (p.name ? ' · ' + escHtml(p.name) : '') + '</b></a>';
+      return '<nav class="pager">' + link(probs[i - 1], "prev") + link(probs[i + 1], "next") + '</nav>';
+    }
+
+    load();
+  </script>
+</body>
+</html>

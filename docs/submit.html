@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Submit</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <a class="nav-btn" href="index.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 5h11M4 12h11M4 19h11M19 5h1M19 12h1M19 19h1"/>
+      </svg>
+      <span>Problems</span>
+    </a>
+
+    <div class="nav-clock">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+      </svg>
+      <span class="num" id="clock">--:--:--</span>
+    </div>
+
+    <a class="nav-btn" href="board.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 20V10M12 20V4M17 20v-7"/>
+      </svg>
+      <span>Scoreboard</span>
+    </a>
+  </header>
+
+  <main class="submit-page">
+
+    <div class="submit-head">
+      <h1>Submit a solution</h1>
+      <p>One problem per submission. Your file is compiled with
+         <code>g++ -O2 -std=c++17</code> and run against hidden tests.</p>
+    </div>
+
+    <div class="gate" id="gate" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/>
+        <path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <div>
+        <b id="gateTitle"></b>
+        <span id="gateText"></span>
+      </div>
+    </div>
+
+    <fieldset class="submit-form" id="form" disabled>
+      <div class="submit-grid">
+        <label class="field">
+          <span>Team</span>
+          <input type="text" id="team" placeholder="Segfault" autocomplete="off">
+        </label>
+        <label class="field">
+          <span>Problem</span>
+          <select id="problem"></select>
+        </label>
+      </div>
+
+      <div class="editor">
+        <div class="editor-bar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="filename" id="filename">solution.cpp</span>
+          <span class="counter num" id="counter">0 lines</span>
+        </div>
+        <textarea id="code" spellcheck="false" autocomplete="off"
+                  placeholder="#include &lt;bits/stdc++.h&gt;&#10;using namespace std;&#10;&#10;int main() {&#10;    &#10;}"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="sendBtn" type="button">
+          <span class="btn-label">Send to the judge</span>
+          <span class="spinner" hidden></span>
+        </button>
+        <span class="hint">Tries on a problem you never solve cost nothing.</span>
+      </div>
+    </fieldset>
+
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast-icon" id="toastIcon"></span>
+    <span class="toast-text" id="toastText"></span>
+  </div>
+
+  <script src="assets/statement.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    let DATA = null;
+    let listed = "";          // problems currently in the drop-down
+    let sending = false;
+
+    async function load() {
+      try {
+        const res = await fetch("data/standings.json?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        DATA = await res.json();
+        if (DATA.contest.closed) { location.replace("closed.html"); return; }
+      } catch (e) {
+        return;   // keep what we have; the next poll tries again
+      }
+
+      // rebuild the list only when it changes, so a student's choice is not reset
+      const key = DATA.problems.map(p => p.id + (p.name || "")).join("|");
+      if (key !== listed) {
+        const keep = $("problem").value ||
+          (new URLSearchParams(location.search).get("problem") || "").toUpperCase();
+        $("problem").innerHTML = DATA.problems.map(p =>
+          '<option value="' + p.id + '">' + p.id + (p.name ? " — " + escHtml(p.name) : "") + "</option>").join("");
+        if (keep && DATA.problems.some(p => p.id === keep)) $("problem").value = keep;
+        listed = key;
+      }
+
+      if (!$("team").value) $("team").value = localStorage.getItem("teamName") || "";
+      updateFilename();
+      tick();
+    }
+
+    /* ── open or closed ── */
+    function applyPhase() {
+      if (!DATA) return;
+      const phase = contestPhase(DATA.contest);
+      const open = phase === "running";
+      $("form").disabled = !open || sending;
+      $("gate").hidden = open;
+      if (open) return;
+
+      const start = DATA.contest.start ? new Date(DATA.contest.start) : null;
+      const at = start ? start.toLocaleString([], {
+        weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "";
+
+      if (phase === "over") {
+        $("gateTitle").textContent = "The contest is over";
+        $("gateText").textContent = "Submissions are closed. Final results are on the scoreboard.";
+      } else {
+        $("gateTitle").textContent = "Submissions open when the contest starts";
+        $("gateText").textContent = (at ? "The contest starts " + at + ". " : "") +
+          "This page unlocks by itself.";
+      }
+    }
+
+    /* ── editor helpers ── */
+    function updateFilename() {
+      const team = $("team").value.trim().replace(/[^\w-]/g, "_") || "team";
+      $("filename").textContent = team + "_" + ($("problem").value || "A") + ".cpp";
+    }
+    function updateCounter() {
+      const n = $("code").value ? $("code").value.split("\n").length : 0;
+      $("counter").textContent = n + (n === 1 ? " line" : " lines");
+    }
+    $("team").addEventListener("input", updateFilename);
+    $("problem").addEventListener("change", updateFilename);
+    $("code").addEventListener("input", updateCounter);
+
+    $("code").addEventListener("keydown", e => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const el = $("code"), s = el.selectionStart, en = el.selectionEnd;
+        el.value = el.value.slice(0, s) + "    " + el.value.slice(en);
+        el.selectionStart = el.selectionEnd = s + 4;
+        updateCounter();
+      }
+    });
+
+    /* ── send ── */
+    $("sendBtn").addEventListener("click", send);
+
+    async function send() {
+      if (!DATA || contestPhase(DATA.contest) !== "running") {
+        applyPhase();
+        toast("err", "Submissions are closed right now.");
+        return;
+      }
+      const team = $("team").value.trim();
+      const problem = $("problem").value;
+      const code = $("code").value;
+
+      if (!team)        { toast("err", "Write your team name first."); $("team").focus(); return; }
+      if (!code.trim()) { toast("err", "Paste your code first."); $("code").focus(); return; }
+
+      sending = true;
+      applyPhase();
+      $("sendBtn").querySelector(".btn-label").textContent = "Sending";
+      $("sendBtn").querySelector(".spinner").hidden = false;
+
+      try {
+        const res = await fetch(DATA.contest.submitUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ team, problem, code })
+        });
+        const out = await res.json();
+        if (!out.ok) throw new Error(out.error || "failed");
+
+        localStorage.setItem("teamName", team);
+        $("code").value = "";
+        updateCounter();
+        toast("ok", "Problem " + problem + " is with the judge. Watch the scoreboard.");
+      } catch (e) {
+        toast("err", "Could not send. Check your connection and try again.");
+      } finally {
+        sending = false;
+        $("sendBtn").querySelector(".btn-label").textContent = "Send to the judge";
+        $("sendBtn").querySelector(".spinner").hidden = true;
+        applyPhase();
+      }
+    }
+
+    let toastTimer = null;
+    function toast(kind, msg) {
+      $("toastIcon").textContent = kind === "ok" ? "✓" : "!";
+      $("toastText").textContent = msg;
+      $("toast").className = "toast show " + kind;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { $("toast").className = "toast " + kind; }, 5000);
+    }
+
+    /* ── clock: also flips the page open at the exact start second ── */
+    function hhmmss(t) {
+      const s = Math.max(0, Math.floor(t));
+      return Math.floor(s / 3600) + ":" +
+        String(Math.floor((s % 3600) / 60)).padStart(2, "0") + ":" +
+        String(s % 60).padStart(2, "0");
+    }
+    function tick() {
+      if (!DATA) return;
+      applyPhase();
+      if (!DATA.contest.start) return;
+      const t0 = new Date(DATA.contest.start).getTime();
+      const t1 = t0 + DATA.contest.durationMinutes * 60000;
+      const now = Date.now();
+      if (now < t0)      $("clock").textContent = hhmmss((t0 - now) / 1000);
+      else if (now < t1) $("clock").textContent = hhmmss((t1 - now) / 1000);
+      else               $("clock").textContent = "0:00:00";
+    }
+
+    load();
+    setInterval(load, 15000);
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>

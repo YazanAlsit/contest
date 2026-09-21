@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scoreboard</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header class="hero">
+    <div class="clock">--:--:--</div>
+    <h1 id="contestTitle">Contest</h1>
+    <a class="cta" href="index.html">Problems</a>
+  </header>
+
+  <main class="wrap wrap-wide">
+    <div class="board-scroll">
+      <table class="board">
+        <thead id="boardHead"></thead>
+        <tbody id="boardBody"></tbody>
+      </table>
+    </div>
+    <p class="note" id="updated"></p>
+  </main>
+
+  <script src="assets/scoring.js"></script>
+  <script src="assets/statement.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    let DATA = null;
+
+    async function load() {
+      try {
+        const res = await fetch("data/standings.json?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        DATA = await res.json();
+        if (DATA.contest.closed) { location.replace("closed.html"); return; }
+        render();
+        tick();
+      } catch (e) {
+        console.warn("Could not load the results:", e.message);
+      }
+    }
+
+    function render() {
+      $("contestTitle").textContent = DATA.contest.title || "Contest";
+      const board = buildBoard(DATA);
+
+      let head = '<tr><th class="rank">#</th><th class="team">Team</th>' +
+                 '<th>Solved</th><th>Penalty</th>';
+      DATA.problems.forEach(p => {
+        head += '<th><span class="plet">' + p.id + '</span>' +
+                (p.speed ? '<span class="psub speed">⚡ first</span>' : '') + '</th>';
+      });
+      $("boardHead").innerHTML = head + '</tr>';
+
+      if (!DATA.teams.length) {
+        $("boardBody").innerHTML = '<tr><td colspan="' + (4 + DATA.problems.length) + '">' +
+          '<div class="empty-line">The teams appear here once the judge publishes them.</div></td></tr>';
+      } else {
+        $("boardBody").innerHTML = board.rows.map(r =>
+          '<tr>' +
+            '<td class="rank num">' + r.rank + '</td>' +
+            '<td class="team"><div class="team-name">' + escHtml(r.team.name) + '</div>' +
+              '<div class="team-members">' + escHtml((r.team.members || []).join(", ")) + '</div></td>' +
+            '<td class="pts num">' + r.solved + '</td>' +
+            '<td class="pen num">' + r.penalty + '</td>' +
+            DATA.problems.map(p =>
+              '<td class="cell">' + verdictBox(board.cells[r.team.id][p.id]) + '</td>').join("") +
+          '</tr>').join("");
+      }
+
+      $("updated").textContent = DATA.updatedAt
+        ? "Last updated " + new Date(DATA.updatedAt).toLocaleTimeString() +
+          ". Ties are broken by penalty: the minute of each solve plus " +
+          (DATA.contest.penaltyPerFail ?? 20) + " minutes for every rejected try before it."
+        : "";
+    }
+
+    function hhmmss(t) {
+      const s = Math.max(0, Math.floor(t));
+      return Math.floor(s / 3600) + ":" +
+        String(Math.floor((s % 3600) / 60)).padStart(2, "0") + ":" +
+        String(s % 60).padStart(2, "0");
+    }
+
+    function tick() {
+      if (!DATA || !DATA.contest.start) return;
+      const t0 = new Date(DATA.contest.start).getTime();
+      const t1 = t0 + DATA.contest.durationMinutes * 60000;
+      const now = Date.now();
+      const el = document.querySelector(".clock");
+      if (now < t0)      el.textContent = hhmmss((t0 - now) / 1000);
+      else if (now < t1) el.textContent = hhmmss((t1 - now) / 1000);
+      else               el.textContent = "0:00:00";
+    }
+
+    load();
+    setInterval(load, 15000);
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# test data, reference solutions, editorial and student code stay on this computer
+judge/
+
+# editor and system clutter
+.vscode/
+.DS_Store
+*.zip

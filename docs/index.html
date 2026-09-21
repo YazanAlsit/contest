@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Problems</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header class="hero hero-compact">
+    <div class="clock">--:--:--</div>
+    <h1 id="contestTitle">Contest</h1>
+    <a class="cta" href="submit.html" id="submitCta">Submit</a>
+    <a class="cta" href="board.html">Scoreboard</a>
+  </header>
+
+  <main class="wrap wrap-narrow">
+
+    <p class="lock-note" id="lockNote" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/>
+        <path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      Problem statements open when the contest starts. This page updates by itself.
+    </p>
+
+    <div class="plist" id="plist"></div>
+
+    <details class="guide">
+      <summary>How to read the constraints</summary>
+      <div class="guide-body">
+        <p>A computer does roughly 10<sup>8</sup> simple operations per second. Look at the largest
+        value of <b>n</b> in the Input section and pick an approach that fits inside the time limit.</p>
+
+        <div class="guide-table">
+          <table>
+            <thead><tr><th>Largest n</th><th>Slowest approach that still fits in 1 s</th></tr></thead>
+            <tbody>
+              <tr><td>n ≤ 10</td>                <td>O(n!) — try every ordering</td></tr>
+              <tr><td>n ≤ 20</td>                <td>O(2<sup>n</sup>) — try every subset</td></tr>
+              <tr><td>n ≤ 500</td>               <td>O(n<sup>3</sup>) — three nested loops</td></tr>
+              <tr><td>n ≤ 5000</td>              <td>O(n<sup>2</sup>) — two nested loops</td></tr>
+              <tr><td>n ≤ 2·10<sup>5</sup></td>  <td>O(n log n) — sorting, binary search, set, map</td></tr>
+              <tr><td>n ≤ 10<sup>7</sup></td>    <td>O(n) — a single pass</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>A program that prints the right answer but runs past the time limit is rejected as
+        <b>Too slow</b>. Read from standard input, write to standard output, C++ only.</p>
+      </div>
+    </details>
+
+  </main>
+
+  <script src="assets/statement.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    let DATA = null;
+
+    async function load() {
+      try {
+        const res = await fetch("data/standings.json?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        DATA = await res.json();
+        if (DATA.contest.closed) { location.replace("closed.html"); return; }
+        $("contestTitle").textContent = DATA.contest.title || "Contest";
+        renderProblems();
+        tick();
+      } catch (e) {
+        console.warn("Could not load the contest:", e.message);
+      }
+    }
+
+    function renderProblems() {
+      const open = !!DATA.contest.revealed;
+      $("lockNote").hidden = open;
+
+      if (!DATA.problems.length) {
+        $("plist").innerHTML = '<div class="empty-line">No problems yet.</div>';
+        return;
+      }
+
+      $("plist").innerHTML = DATA.problems.map(p =>
+        '<a class="prow' + (open ? '' : ' locked') + '" href="problem.html?id=' + p.id + '">' +
+          '<span class="pid">' + p.id + '</span>' +
+          '<span class="pname">' + (open ? escHtml(p.name || "Problem " + p.id) : "Opens at the start") + '</span>' +
+          (open && p.speed ? '<span class="speed-tag">⚡ Speed</span>' : '') +
+        '</a>').join("");
+    }
+
+    function hhmmss(t) {
+      const s = Math.max(0, Math.floor(t));
+      return Math.floor(s / 3600) + ":" +
+        String(Math.floor((s % 3600) / 60)).padStart(2, "0") + ":" +
+        String(s % 60).padStart(2, "0");
+    }
+
+    function applyPhase() {
+      const open = contestPhase(DATA.contest) === "running";
+      const b = $("submitCta");
+      b.classList.toggle("is-off", !open);
+      b.setAttribute("aria-disabled", String(!open));
+      b.tabIndex = open ? 0 : -1;
+      b.title = open ? "" : "Submissions open when the contest starts";
+    }
+
+    function tick() {
+      if (!DATA) return;
+      applyPhase();
+      if (!DATA.contest.start) return;
+      const t0 = new Date(DATA.contest.start).getTime();
+      const t1 = t0 + DATA.contest.durationMinutes * 60000;
+      const now = Date.now();
+      const el = document.querySelector(".clock");
+      if (now < t0)      el.textContent = hhmmss((t0 - now) / 1000);
+      else if (now < t1) el.textContent = hhmmss((t1 - now) / 1000);
+      else               el.textContent = "0:00:00";
+    }
+
+    load();
+    setInterval(load, 15000);
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>

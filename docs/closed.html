@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contest ended</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <main class="closed-page">
+    <div class="closed-card" id="card">
+      <p>Loading…</p>
+    </div>
+  </main>
+
+  <script src="assets/scoring.js"></script>
+  <script src="assets/statement.js"></script>
+  <script>
+    async function load() {
+      let data;
+      try {
+        const res = await fetch("data/standings.json?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        data = await res.json();
+      } catch (e) {
+        return;
+      }
+
+      // the judge reopened the site: go back to the problems
+      if (!data.contest.closed) { location.replace("index.html"); return; }
+
+      const c = data.contest;
+      const title = c.title || "The contest";
+      document.title = title + " has ended";
+
+      let h =
+        '<div class="closed-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>' +
+        "<h1>" + escHtml(title) + " has ended</h1>" +
+        "<p>" + escHtml(c.closedMessage || "Thank you to every team that took part.") + "</p>";
+
+      if (c.showPodium !== false && data.teams.length) {
+        const rows = buildBoard(data).rows.filter(r => r.score > 0).slice(0, 3);
+        if (rows.length) {
+          h += '<div class="podium"><div class="podium-title">FINAL STANDINGS</div>' +
+            rows.map(r =>
+              '<div class="podium-row p' + r.rank + '">' +
+                '<span class="podium-place">' + r.rank + "</span>" +
+                '<div class="podium-main">' +
+                  '<div class="podium-name">' + escHtml(r.team.name) + "</div>" +
+                  '<div class="podium-members">' + escHtml((r.team.members || []).join(", ")) + "</div>" +
+                "</div>" +
+                '<div class="podium-score"><b>' + r.solved + (r.solved === 1 ? " problem" : " problems") + "</b>" +
+                  "<small>penalty " + r.penalty + "</small></div>" +
+              "</div>").join("") +
+          "</div>";
+        }
+      }
+
+      document.getElementById("card").innerHTML = h;
+    }
+
+    load();
+    setInterval(load, 30000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "contest": {
+    "title": "Lab Contest — Round 1",
+    "start": "2026-09-21T13:00:00.000Z",
+    "durationMinutes": 180,
+    "penaltyPerFail": 20,
+    "submitUrl": "https://contest-submit.yazanalsit680.workers.dev/",
+    "revealed": false,
+    "closed": false,
+    "closedMessage": "",
+    "showPodium": false
+  },
+  "problems": [
+    {
+      "id": "A",
+      "timeLimit": 1,
+      "memoryLimit": 256
+    },
+    {
+      "id": "B",
+      "timeLimit": 1,
+      "memoryLimit": 256
+    },
+    {
+      "id": "C",
+      "timeLimit": 1,
+      "memoryLimit": 256
+    },
+    {
+      "id": "D",
+      "timeLimit": 1,
+      "memoryLimit": 256
+    },
+    {
+      "id": "E",
+      "timeLimit": 1,
+      "memoryLimit": 256
+    },
+    {
+      "id": "F",
+      "timeLimit": 1,
+      "memoryLimit": 256
+    },
+    {
+      "id": "G",
+      "timeLimit": 1,
+      "memoryLimit": 256
+    },
+    {
+      "id": "H",
+      "timeLimit": 2,
+      "memoryLimit": 256
+    }
+  ],
+  "teams": [],
+  "submissions": [],
+  "updatedAt": "2026-09-21T14:16:30.400Z"
+}
