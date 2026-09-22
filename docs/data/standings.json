@@ -1,8 +1,8 @@
 {
   "contest": {
-    "title": "Lab Contest — Round 1",
-    "start": "2026-09-21T13:00:00.000Z",
-    "durationMinutes": 180,
+    "title": "Dry run",
+    "start": "2026-09-22T10:00:00.000Z",
+    "durationMinutes": 20,
     "penaltyPerFail": 20,
     "submitUrl": "https://contest-submit.yazanalsit680.workers.dev/",
     "revealed": false,
@@ -54,5 +54,5 @@
   ],
   "teams": [],
   "submissions": [],
-  "updatedAt": "2026-09-22T09:47:47.580Z"
+  "updatedAt": "2026-09-22T09:58:01.078Z"
 }
