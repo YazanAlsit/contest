@@ -38,7 +38,7 @@
     },
     {
       "id": "F",
-      "timeLimit": 1,
+      "timeLimit": 2,
       "memoryLimit": 256
     },
     {
@@ -48,11 +48,11 @@
     },
     {
       "id": "H",
-      "timeLimit": 2,
+      "timeLimit": 1,
       "memoryLimit": 256
     }
   ],
   "teams": [],
   "submissions": [],
-  "updatedAt": "2026-09-22T14:18:12.681Z"
+  "updatedAt": "2026-09-22T14:18:33.120Z"
 }
