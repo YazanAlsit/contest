@@ -1,11 +1,11 @@
 {
   "contest": {
     "title": "Dry run",
-    "start": null,
-    "durationMinutes": 20,
+    "start": "2026-09-22T14:25:00.000Z",
+    "durationMinutes": 60,
     "penaltyPerFail": 20,
     "submitUrl": "https://contest-submit.yazanalsit680.workers.dev/",
-    "revealed": false,
+    "revealed": true,
     "closed": false,
     "closedMessage": "",
     "showPodium": false
@@ -13,46 +13,209 @@
   "problems": [
     {
       "id": "A",
+      "name": "Two Shelves",
       "timeLimit": 1,
-      "memoryLimit": 256
+      "memoryLimit": 256,
+      "legend": "Rania has just opened a tiny second-hand bookshop in the old market, and she is proud of the two wooden shelves her grandfather built for her by hand. This morning a delivery van dropped off **n** books, all of the same size, and she wants to put every single one of them on the two shelves before the first customers arrive.\n\nHer grandfather built the shelves in a peculiar way. Each shelf is divided into small compartments, and every compartment holds exactly **k** books, no more and no less. A compartment that is only partly filled looks untidy, and Rania will not allow that, so on each shelf the number of books must be a whole multiple of k. On top of that, she wants both shelves to show something to the customers, so neither shelf may stay empty: each of them must hold at least one full compartment.\n\nThe two shelves do not have to hold the same number of books. One shelf may have a single compartment of k books while the other has many compartments. The only rules are that every book goes on one of the two shelves, that each shelf holds a multiple of k books, and that each shelf holds at least k books.\n\nFor example, with twelve books and compartments of three, Rania could put three books on the first shelf and nine on the second, or six on each. With five books and compartments of five, she can fill exactly one compartment, but then the other shelf would be empty, so it is impossible.\n\nRania is busy unpacking and asks you to tell her quickly whether the books can be arranged according to her rules. She does not need to know how to arrange them, only whether it can be done at all. If the answer is no, she will simply keep the extra boxes in the storeroom and try again tomorrow, when the next delivery arrives and the numbers are different.",
+      "input": "The only line contains two integers **n** and **k** (1 <= n, k <= 10^9) -- the number of books and the size of one compartment.",
+      "output": "Print YES if the books can be placed on the two shelves following Rania's rules, and NO otherwise.",
+      "samples": [
+        {
+          "input": "12 3",
+          "output": "YES"
+        },
+        {
+          "input": "5 5",
+          "output": "NO"
+        }
+      ],
+      "notes": "In the first example three books can go on one shelf and nine on the other, and both numbers are multiples of 3. In the second example the only way to use full compartments of five is to put all five books on one shelf, which leaves the other shelf empty, so the answer is NO.",
+      "figures": []
     },
     {
       "id": "B",
+      "name": "Calm Days",
       "timeLimit": 1,
-      "memoryLimit": 256
+      "memoryLimit": 256,
+      "legend": "Omar keeps a small weather station on the roof of his school. Every day at noon he reads the thermometer and writes the temperature in his notebook as a whole number of degrees. He has done this for **n** days in a row without missing a single one, and the notebook now holds n numbers, one for each day, in order.\n\nOmar's teacher asked the class a question about stability. A calm period is a group of consecutive days on which the temperature did not change at all: every day in the group has exactly the same temperature as the day before it. Omar's school is in a city by the sea, where the weather can stay the same for a long time and then change suddenly, so some of his calm periods are surprisingly long, while others last only a day. A single day on its own also counts as a calm period of length one, because nothing changed within it.\n\nThe teacher wants to know the length of the longest calm period in Omar's notebook, that is, the largest number of consecutive days that all share the same temperature. The days must be next to each other in the notebook. Two days with the same temperature that are separated by a different day do not belong to the same calm period.\n\nFor example, if the notebook reads 3, 3, 5, 5, 5, 2, 2, then the first two days form a calm period of length two, the next three days form one of length three, and the last two days form one of length two. The longest of them has length three. If every day has a different temperature from the day before, the longest calm period is simply one day.\n\nOmar has a lot of days in his notebook and would like a program to find the answer for him. Help him write it, so that he can hand in his homework on time. His teacher has promised that the student with the longest calm period in the whole class will get to choose the topic of the next science lesson, and Omar really wants to win.",
+      "input": "The first line contains one integer **n** (1 <= n <= 10^5) -- the number of days. The second line contains n integers t_1, t_2, ..., t_n (1 <= t_i <= 1000) -- the temperatures in the order they were written.",
+      "output": "Print one integer -- the length of the longest calm period.",
+      "samples": [
+        {
+          "input": "7\n3 3 5 5 5 2 2",
+          "output": "3"
+        },
+        {
+          "input": "4\n1 2 3 4",
+          "output": "1"
+        }
+      ],
+      "notes": "In the first example the three days with temperature 5 form the longest calm period. In the second example the temperature changes every day, so the longest calm period is a single day.",
+      "figures": []
     },
     {
       "id": "C",
+      "name": "Mirror Name",
       "timeLimit": 1,
-      "memoryLimit": 256
+      "memoryLimit": 256,
+      "legend": "Lina designs signs for shops, and her newest customer runs a mirror shop. He has a very particular wish for his sign: he wants the name of his shop to read exactly the same from left to right as from right to left, so that it looks the same when it is reflected in his own mirrors. Words like that are called palindromes. For example racecar and level are palindromes, while mirror is not.\n\nThe customer has already chosen a name, a word made of lowercase English letters, and he is quite attached to it. Unfortunately it is usually not a palindrome. Lina can fix that by changing some of its letters, but every changed letter means a new stencil and more work, so she wants to change as few letters as possible. Stencils are cut by hand in her workshop, each one takes almost an hour, and the customer has already made it clear that he does not want to pay for a single stencil more than necessary. She may change a letter into any other lowercase letter, but she may not add letters, remove letters or move them around. The length of the name stays the same.\n\nThink of the name as a row of letters and look at it from both ends at once. The first letter must match the last one, the second letter must match the one before last, and so on towards the middle. When a word has an odd length, the letter in the very middle has no partner and can be anything. Whenever the two letters of such a pair are different, Lina has to change one of them, and changing one of them is always enough to make that pair match.\n\nFor example, the name abca becomes a palindrome after changing a single letter, giving abba or acca. The name racecar is already a palindrome and needs no changes at all.\n\nFind the smallest number of letters Lina has to change to turn the customer's name into a palindrome. She does not need to know which letters to change or what to change them into; she only needs the number, so that she can tell the customer the price of the sign before he leaves the shop.",
+      "input": "The only line contains a word s of lowercase English letters (1 <= length of s <= 10^5).",
+      "output": "Print one integer -- the smallest number of letters that must be changed.",
+      "samples": [
+        {
+          "input": "abca",
+          "output": "1"
+        },
+        {
+          "input": "racecar",
+          "output": "0"
+        }
+      ],
+      "notes": "In the first example the second letter b and the third letter c form a pair that does not match; changing either one of them fixes it, so one change is enough. In the second example the word is already a palindrome.",
+      "figures": []
     },
     {
       "id": "D",
+      "name": "Exact Change",
       "timeLimit": 1,
-      "memoryLimit": 256
+      "memoryLimit": 256,
+      "legend": "The central bank of a small island country prints no paper money at all. Everything is paid with coins, and there are exactly five kinds of them, worth 1, 2, 5, 10 and 50 units. The shopkeepers of the island are famous for being in a hurry, so whenever they give change they always want to hand over as few coins as possible. Nobody on the island likes to leave a shop with heavy pockets, and a shopkeeper who hands out a fistful of small coins when a few larger ones would do is quickly known in the whole market as a slow and careless one.\n\nA new supermarket has opened on the island, and its owner wants to install an automatic machine that gives change. Before buying it, she would like to test a program that decides how many coins the machine should hand out for any amount. The amount can be enormous, because the machine is also used by the bank itself to pay out large sums in coins, and some of these payments are counted in the billions of billions of units.\n\nThe machine has an unlimited supply of every coin, and it may use any mix of the five kinds. It must pay the amount exactly, with no money missing and nothing extra. Among all the ways of paying exactly that amount, it should choose one that uses the smallest possible number of coins.\n\nFor example, an amount of 68 can be paid as 50 + 10 + 5 + 2 + 1, which is five coins, and there is no way to pay 68 with fewer. An amount of 4 is best paid with two coins of 2, rather than four coins of 1.\n\nThe supermarket owner only needs the number of coins, not the list of them. Write the program that computes it, so that she can finally order the machine. The company that sells the machine has promised to install it as soon as the program is ready and tested, and the owner hopes to have it working before the busy holiday season, when long lines at the till are her worst nightmare.",
+      "input": "The only line contains one integer **n** (1 <= n <= 10^18) -- the amount to pay.",
+      "output": "Print one integer -- the smallest number of coins that add up to exactly n.",
+      "samples": [
+        {
+          "input": "68",
+          "output": "5"
+        },
+        {
+          "input": "4",
+          "output": "2"
+        }
+      ],
+      "notes": "In the first example 68 = 50 + 10 + 5 + 2 + 1, which uses five coins. In the second example 4 = 2 + 2, which uses two coins; paying with four coins of 1 would also be exact, but it uses more coins.",
+      "figures": []
     },
     {
       "id": "E",
+      "name": "The Relay Station",
       "timeLimit": 1,
-      "memoryLimit": 256
+      "memoryLimit": 256,
+      "speed": true,
+      "legend": "High in the northern mountains, far from any town, stands an old radio relay station. It was built during the great storms of the last century to keep the villages in the valleys connected with the capital, and it has been working without a break ever since. The station sits on a bare rocky peak, and in winter the snow buries it so deeply that the engineers who maintain it can only reach it by helicopter, and only on the rare days when the wind drops.\n\nThe station has a single job, and it is described in a thick manual that every engineer must read before their first visit. Messages arrive from the valley on one antenna, pass through a long chain of amplifiers, filters, converters and error-correcting circuits, and leave on another antenna towards the capital. The manual explains every stage in detail: how the signal is cleaned of noise from the storms, how it is checked against lightning damage, how it is compressed to save power in the dark months, and how it is decompressed again on the far side. There are hundreds of pages of diagrams, tables of frequencies and warnings printed in red.\n\nLast week the old control computer of the station finally broke, and the engineers must replace its program before the next storm arrives. Many of them spent days studying the manual, trying to understand which of the hundreds of stages the new program has to reproduce, and some of them are convinced that it will take months to rewrite everything.\n\nThe chief engineer, who has worked at the station for thirty years, laughed when she heard this. All the amplifiers, filters and converters are built into the hardware, she explained, and they will keep working on their own. The only thing the control computer ever did was to receive the code number of each message from the valley and send exactly the same code number on to the capital, unchanged, so that the capital knows which message has arrived. It never adds anything, never changes a digit, and never prints any words around the number.\n\nYour team has been asked to write the new control program. It will receive one code number and must pass it on, exactly as it came in.",
+      "input": "The only line contains one integer **n** (1 <= n <= 10^9) -- the code number received from the valley.",
+      "output": "Print the code number that the station must send on to the capital.",
+      "samples": [
+        {
+          "input": "1",
+          "output": "1"
+        },
+        {
+          "input": "42",
+          "output": "42"
+        }
+      ],
+      "notes": "In both examples the station receives a code number and passes exactly the same number on to the capital. This is the speed problem: only the first team to solve it gets it.",
+      "figures": []
     },
     {
       "id": "F",
+      "name": "Friendly Pairs",
       "timeLimit": 2,
-      "memoryLimit": 256
+      "memoryLimit": 256,
+      "legend": "In the far eastern province of the kingdom there is a village where every family has a lucky number. The number is chosen when the family first settles in the village, it is carved above the door of the house, and it never changes afterwards, not even when the family grows or moves to a larger house. The villagers take their lucky numbers very seriously, and over the centuries they have developed a whole philosophy around them.\n\nAccording to the village elders, two families are friendly when their lucky numbers have nothing in common. By \"nothing in common\" the elders mean something precise: there is no whole number greater than one that divides both of the lucky numbers without a remainder. In the language of mathematics, the greatest common divisor of the two numbers is exactly one. For example, the families with lucky numbers 8 and 15 are friendly, because no number larger than one divides both 8 and 15. The families with lucky numbers 6 and 10 are not friendly, because both of their numbers can be divided by 2. A family with the lucky number 1 is friendly with every other family in the village, since the only number that divides 1 is 1 itself, and two families that both have the lucky number 1 are friendly with each other as well.\n\nOnce every year, on the longest night of winter, the village holds a great festival. The elders want the festival to be as peaceful as possible, and they believe that friendly families bring peace. For that reason they like to know in advance how many friendly pairs of families there are in the whole village. A pair consists of two different families, and the order inside the pair does not matter, so the pair of the Haddad family and the Salem family is the same pair as the Salem family and the Haddad family, and it is counted only once. Two different families may well have the same lucky number, and then they are still two different families that form a pair of their own.\n\nFor many centuries the village was small, and the elders could simply sit down together, list every pair of families on a long roll of paper and check each pair by hand. It took a few evenings, but it was always done in time for the festival.\n\nThings have changed. A new railway now connects the province with the capital, and the village has grown into a small city with **n** families, far more than anyone could ever check by hand. Each family still has its own lucky number, and the numbers themselves have grown as well. The number of pairs of families is now so large that even the fastest scribe in the kingdom, checking one pair every second without sleeping, would not finish before the festival of the next century.\n\nThe elders have come to you with the lucky numbers of all n families written on a single long list. They ask you for just one number: how many pairs of different families in the village are friendly. They warn you that they need the answer before the festival begins, which is very soon, and that the answer may be surprisingly large, much larger than the number of families itself.\n\nThe elders also remind you, with the patience of people who have explained it many times before, that only the lucky numbers matter. Names, the order of the list and the size of the houses are irrelevant. Two families are friendly exactly when the greatest common divisor of their two lucky numbers equals one, and every pair of different families is either friendly or not. Count the friendly ones.",
+      "input": "The first line contains one integer **n** (2 <= n <= 2*10^5) -- the number of families. The second line contains n integers a_1, a_2, ..., a_n (1 <= a_i <= 10^6) -- the lucky numbers of the families.",
+      "output": "Print one integer -- the number of pairs of different families whose lucky numbers have a greatest common divisor equal to one.",
+      "samples": [
+        {
+          "input": "4\n2 3 4 5",
+          "output": "5"
+        },
+        {
+          "input": "3\n6 10 15",
+          "output": "0"
+        }
+      ],
+      "notes": "In the first example the lucky numbers are 2, 3, 4 and 5. Out of the six possible pairs, only the pair 2 and 4 is not friendly, because both numbers are divisible by 2. The pairs 2 and 3, 2 and 5, 3 and 4, 3 and 5, and 4 and 5 are all friendly, so the answer is 5.\n\nIn the second example the lucky numbers are 6, 10 and 15. The pair 6 and 10 shares the divisor 2, the pair 6 and 15 shares the divisor 3, and the pair 10 and 15 shares the divisor 5, so no pair is friendly and the answer is 0.\n\nBe careful with the size of the answer: with two hundred thousand families there are almost twenty billion pairs.",
+      "figures": []
     },
     {
       "id": "G",
+      "name": "Remove One",
       "timeLimit": 1,
-      "memoryLimit": 256
+      "memoryLimit": 256,
+      "legend": "A running club is choosing a team for a relay race. The coach has written down the personal best times of **n** runners, and she wants the team to be as even as possible, because in a relay a team with very different runners tends to lose time at every handover. She measures how even a group is by its spread: the difference between the slowest time and the fastest time in the group. The smaller the spread, the more even the team.\n\nThere is one complication. The race rules say that the team must have exactly n minus 1 runners, so exactly one of the n runners on the coach's list has to stay behind and cheer from the side. The coach may choose any one of them to leave out. After that runner is removed, the spread of the remaining runners is again the slowest time minus the fastest time among them.\n\nThe coach wants to choose the runner to leave out so that the spread of the remaining team is as small as possible. For example, if the times are 7, 3, 1 and 3, then leaving out the runner with time 7 leaves the times 3, 1 and 3, whose spread is 3 minus 1, which is 2. Leaving out the runner with time 1 would leave a spread of 7 minus 3, which is 4, and leaving out one of the runners with time 3 would leave a spread of 7 minus 1, which is 6. So the best the coach can do is a spread of 2.\n\nIt may happen that several runners have exactly the same time, and it may also happen that all of them do, in which case the spread is zero no matter who stays behind. Find the smallest spread the coach can achieve by leaving exactly one runner out of the team.",
+      "input": "The first line contains one integer **n** (3 <= n <= 10^5) -- the number of runners. The second line contains n integers a_1, a_2, ..., a_n (1 <= a_i <= 10^9) -- their times.",
+      "output": "Print one integer -- the smallest possible difference between the slowest and the fastest time after exactly one runner is removed.",
+      "samples": [
+        {
+          "input": "4\n7 3 1 3",
+          "output": "2"
+        },
+        {
+          "input": "3\n5 5 5",
+          "output": "0"
+        }
+      ],
+      "notes": "In the first example leaving out the runner with time 7 gives the spread 3 minus 1, which is 2, and no other choice does better. In the second example all runners have the same time, so the spread is 0 whoever is removed.",
+      "figures": []
     },
     {
       "id": "H",
+      "name": "Train Arrival",
       "timeLimit": 1,
-      "memoryLimit": 256
+      "memoryLimit": 256,
+      "legend": "The night train from the coast to the mountains is famous for two things: the beautiful views and the fact that nobody ever knows when it will arrive. The railway company has decided to fix at least the second problem. From now on, every station will show a display with the arrival time of the train, calculated from the time it left the previous station and the number of minutes the journey takes. Passengers have complained for years that they had to sit in cold waiting rooms without any idea whether the train would come in ten minutes or in two hours, and the company hopes that the new displays will finally put an end to those complaints.\n\nThe displays use the familiar 24-hour clock. A time is written as hh:mm, where hh is the hour from 00 to 23 and mm is the minute from 00 to 59. Both parts always have exactly two digits, so five minutes past nine in the morning is written 09:05 and five minutes past midnight is written 00:05. The day wraps around: one minute after 23:59 comes 00:00, the beginning of the next day. The displays only show the time of day, never the date, so a train that arrives several days later still shows just the hour and the minute.\n\nYou are given the departure time of the train and the length of the journey in minutes. The journey can be very long, because some of the company's freight trains take many days to cross the whole continent and the same program is used for them as well. It can also be zero minutes long, in which case the train arrives exactly when it leaves.\n\nFor example, a train that leaves at 23:50 and travels for 15 minutes arrives at 00:05. A train that leaves at 09:05 and travels for 60 minutes arrives at 10:05.\n\nWrite the program that computes what the display should show when the train arrives. The displays are old and simple, so the program must print the time in exactly the format described above, because any other format would appear on the screen as nonsense.",
+      "input": "The only line contains the departure time in the form hh:mm (00 <= hh <= 23, 00 <= mm <= 59) and, after a space, one integer **d** (0 <= d <= 10^9) -- the length of the journey in minutes.",
+      "output": "Print the arrival time in the form hh:mm, with exactly two digits for the hour and two digits for the minute.",
+      "samples": [
+        {
+          "input": "23:50 15",
+          "output": "00:05"
+        },
+        {
+          "input": "09:05 60",
+          "output": "10:05"
+        }
+      ],
+      "notes": "In the first example the train passes midnight after ten minutes and arrives five minutes into the new day, so the display shows 00:05. In the second example the train arrives exactly one hour after it left.",
+      "figures": []
     }
   ],
-  "teams": [],
+  "teams": [
+    {
+      "id": "tmucrgkg84hi",
+      "name": "Optic Code",
+      "members": [
+        "Rabe Salema",
+        "Roz Malouli",
+        "Joudi Rabbate",
+        "Sedra Shebani",
+        "Abrar Abbas"
+      ]
+    },
+    {
+      "id": "tmucrh3z4v69",
+      "name": "SHERY",
+      "members": [
+        "Shahad Alabdullah",
+        "Elaf Alwakaa",
+        "Yasmin Mustafa",
+        "Rama Alkordi",
+        "Shahad Mohammad"
+      ]
+    },
+    {
+      "id": "tmucrhohtqs2",
+      "name": "Hasbulla 3amak",
+      "members": [
+        "Morhf Dlikan",
+        "Maysa Ahmad",
+        "Shaam Orij",
+        "Sarah Salamah",
+        "Aya Alashkar"
+      ]
+    }
+  ],
   "submissions": [],
-  "updatedAt": "2026-09-22T14:19:05.920Z"
+  "updatedAt": "2026-09-22T14:23:13.544Z"
 }
