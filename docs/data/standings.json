@@ -216,6 +216,13 @@
       ]
     }
   ],
-  "submissions": [],
-  "updatedAt": "2026-09-22T14:32:28.416Z"
+  "submissions": [
+    {
+      "team": "tmucrhohtqs2",
+      "problem": "E",
+      "minute": 13,
+      "verdict": "PENDING"
+    }
+  ],
+  "updatedAt": "2026-09-22T14:38:35.705Z"
 }
