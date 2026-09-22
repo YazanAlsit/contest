@@ -1269,6 +1269,42 @@ input[type="datetime-local"] { color-scheme: dark; }
 .speed-row { grid-column: 1 / -1; margin-top: 4px; }
 .speed-row b { color: var(--tle); font-weight: 600; }
 
+/* publish button in the judge panel */
+.publish-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 16px;
+  border-radius: 9px;
+  border: 1px solid var(--glow-edge);
+  background: var(--glow-soft);
+  color: var(--glow);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.publish-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--glow) 18%, transparent); }
+.publish-btn:disabled { opacity: .6; cursor: progress; }
+.pub-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ac); flex-shrink: 0; }
+.publish-btn.dirty { background: var(--glow); color: #0d0718; border-color: var(--glow); }
+.publish-btn.dirty .pub-dot { background: #0d0718; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+
+.pub-status {
+  position: sticky;
+  top: 58px;
+  z-index: 39;
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  text-align: center;
+}
+.pub-status.ok  { background: var(--ac-bg); color: var(--ac); }
+.pub-status.err { background: var(--wa-bg); color: var(--wa); }
+
 /* admin: on / off switch */
 .switch-row { display: flex; align-items: center; gap: 14px; cursor: pointer; }
 .switch-row input { position: absolute; opacity: 0; pointer-events: none; }

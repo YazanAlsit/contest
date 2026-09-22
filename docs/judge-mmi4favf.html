@@ -25,7 +25,14 @@
       </svg>
       <span>Scoreboard</span>
     </a>
+
+    <button class="publish-btn" id="publishBtn" type="button" title="Send the current standings to the site">
+      <span class="pub-dot" id="pubDot"></span>
+      <span class="pub-label" id="pubLabel">Publish</span>
+    </button>
   </header>
+
+  <div class="pub-status" id="pubStatus" hidden></div>
 
   <main class="wrap wrap-wide">
 
@@ -239,6 +246,33 @@
 
       <section class="panel">
         <div class="panel-head">
+          <h2>Publishing to GitHub</h2>
+          <span class="panel-sub" id="ghNote"></span>
+        </div>
+        <div class="card">
+          <div class="form-row form-row-3">
+            <label class="field">
+              <span>GitHub username</span>
+              <input type="text" id="ghOwner" autocomplete="off" spellcheck="false" placeholder="yazan123">
+            </label>
+            <label class="field">
+              <span>Repository</span>
+              <input type="text" id="ghRepo" autocomplete="off" spellcheck="false" placeholder="contest">
+            </label>
+          </div>
+          <label class="field">
+            <span>Access token</span>
+            <input type="password" id="ghToken" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+          </label>
+          <p class="syntax" style="margin:10px 2px 0">
+            The token stays in this browser only. It is never included in backups and never sent anywhere except GitHub.
+            Publish writes <code>docs/data/standings.json</code> on the <code>main</code> branch.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
           <h2>Visibility</h2>
         </div>
         <div class="card">
@@ -409,6 +443,7 @@
 
     function save() {
       localStorage.setItem(KEY, JSON.stringify(S));
+      if (typeof pubState === "function") pubState();
     }
 
     function redraw() {
@@ -1148,6 +1183,129 @@
       location.reload();
     });
 
+    /* ═══════════ PUBLISH ═══════════ */
+    // GitHub settings live under their own key, so a backup file never carries the token.
+    const GHKEY = "judge-github-v1";
+    const PUBKEY = "judge-published-v1";
+    let GH = {};
+    try { GH = JSON.parse(localStorage.getItem(GHKEY)) || {}; } catch (e) { GH = {}; }
+
+    ["ghOwner", "ghRepo", "ghToken"].forEach(id => {
+      const key = { ghOwner: "owner", ghRepo: "repo", ghToken: "token" }[id];
+      $(id).value = GH[key] || "";
+      $(id).addEventListener("input", () => {
+        GH[key] = $(id).value.trim();
+        localStorage.setItem(GHKEY, JSON.stringify(GH));
+        ghNote();
+      });
+    });
+
+    function ghNote() {
+      $("ghNote").textContent = GH.owner && GH.repo && GH.token ? "Ready" : "Fill in all three to publish";
+    }
+
+    // what the site would receive right now, without the time stamp, to spot unpublished changes
+    function fingerprint() {
+      const d = publicData();
+      delete d.updatedAt;
+      return JSON.stringify(d);
+    }
+
+    function pubState() {
+      const last = localStorage.getItem(PUBKEY);
+      const dirty = !S || last !== fingerprint();
+      $("publishBtn").classList.toggle("dirty", dirty);
+      $("pubDot").title = dirty ? "There are changes students cannot see yet" : "Students see the latest version";
+    }
+
+    function b64(text) {
+      const bytes = new TextEncoder().encode(text);
+      let bin = "";
+      for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+      return btoa(bin);
+    }
+
+    function pubMessage(kind, text) {
+      $("pubStatus").className = "pub-status " + kind;
+      $("pubStatus").textContent = text;
+      $("pubStatus").hidden = false;
+      clearTimeout(pubMessage.t);
+      if (kind !== "err") pubMessage.t = setTimeout(() => $("pubStatus").hidden = true, 6000);
+    }
+
+    let publishing = false;
+    $("publishBtn").addEventListener("click", publish);
+
+    async function publish() {
+      if (publishing) return;
+      if (!(GH.owner && GH.repo && GH.token)) {
+        showTab("contest");
+        $("ghOwner").focus();
+        pubMessage("err", "Fill in your GitHub username, repository and token first (Contest tab).");
+        return;
+      }
+
+      publishing = true;
+      $("publishBtn").disabled = true;
+      $("pubLabel").textContent = "Publishing…";
+
+      const url = "https://api.github.com/repos/" + encodeURIComponent(GH.owner) + "/" +
+                  encodeURIComponent(GH.repo) + "/contents/docs/data/standings.json";
+      const headers = {
+        "Authorization": "Bearer " + GH.token,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
+      };
+      const snapshot = publicData();
+      const body = JSON.stringify(snapshot, null, 2) + "\n";
+
+      try {
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          // the file's current version id is needed to replace it
+          const head = await fetch(url + "?ref=main&t=" + Date.now(), { headers, cache: "no-store" });
+          if (!head.ok && head.status !== 404) throw await ghError(head);
+          const sha = head.ok ? (await head.json()).sha : undefined;
+
+          const put = await fetch(url, {
+            method: "PUT",
+            headers: Object.assign({ "Content-Type": "application/json" }, headers),
+            body: JSON.stringify({
+              message: "Update standings " + new Date().toLocaleTimeString(),
+              content: b64(body),
+              branch: "main",
+              sha
+            })
+          });
+          if (put.ok) break;
+          if (put.status === 409 && attempt === 1) continue;   // someone changed it in between: try once more
+          throw await ghError(put);
+        }
+
+        localStorage.setItem(PUBKEY, fingerprint());
+        pubState();
+        const t = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        $("pubLabel").textContent = "Published " + t;
+        pubMessage("ok", "Published. The site shows it within about a minute.");
+      } catch (e) {
+        $("pubLabel").textContent = "Publish";
+        pubMessage("err", "Could not publish: " + e.message);
+      } finally {
+        publishing = false;
+        $("publishBtn").disabled = false;
+      }
+    }
+
+    async function ghError(res) {
+      let msg = "";
+      try { msg = (await res.json()).message || ""; } catch (e) {}
+      if (res.status === 401) return new Error("the token is wrong or has expired.");
+      if (res.status === 403) return new Error("the token is not allowed to write to this repository (Contents: Read and write).");
+      if (res.status === 404) return new Error("repository not found. Check the username and the repository name.");
+      return new Error((msg || "GitHub answered " + res.status) + ".");
+    }
+
+    ghNote();
+
     /* ═══════════ helpers ═══════════ */
     function esc(s) {
       return escHtml(s);
@@ -1173,6 +1331,7 @@
 
     init();
     setInterval(tick, 1000);
+    setTimeout(() => { try { pubState(); } catch (e) {} }, 300);
   </script>
 </body>
 </html>
