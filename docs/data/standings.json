@@ -1,7 +1,7 @@
 {
   "contest": {
     "title": "Dry run",
-    "start": "2026-09-22T10:30:00.000Z",
+    "start": null,
     "durationMinutes": 20,
     "penaltyPerFail": 20,
     "submitUrl": "https://contest-submit.yazanalsit680.workers.dev/",
@@ -54,5 +54,5 @@
   ],
   "teams": [],
   "submissions": [],
-  "updatedAt": "2026-09-22T10:30:32.644Z"
+  "updatedAt": "2026-09-22T10:30:42.172Z"
 }
