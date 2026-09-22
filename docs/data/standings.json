@@ -5,7 +5,7 @@
     "durationMinutes": 20,
     "penaltyPerFail": 20,
     "submitUrl": "https://contest-submit.yazanalsit680.workers.dev/",
-    "revealed": true,
+    "revealed": false,
     "closed": false,
     "closedMessage": "",
     "showPodium": false
@@ -13,171 +13,46 @@
   "problems": [
     {
       "id": "A",
-      "name": "Price Range",
       "timeLimit": 1,
-      "memoryLimit": 256,
-      "legend": "Bazaar is a small online shop that sells handmade things: ceramic cups from a village by the sea, wool scarves knitted by a group of grandmothers in the mountains, wooden spoons, leather notebooks and tiny painted boxes that no factory would ever make. It started as the hobby of two friends, and over the years it has grown until its catalogue now lists **n** products. Product i costs exactly a_i coins. Many artisans like round prices, so it is perfectly normal for several different products to cost exactly the same amount, and because the catalogue is stored in the order in which products were added, the prices in it appear in no particular order at all.\n\nThe favourite feature of the shoppers is the price filter at the top of every page. A shopper types a lowest price l and a highest price r, and the page shows every product whose price is at least l and at most r, with both ends included, so a product that costs exactly l or exactly r is shown too. Next to the filter the page displays how many products match, and people use that number constantly. Some move the filter around just to watch it change, and some decide whether a price range is worth browsing at all by looking at it before they scroll. If the same number is typed into both boxes, the page shows exactly the products with that price, and if nothing fits, the counter simply says zero.\n\nWhen the shop was small, the counter was computed in the simplest way imaginable: for every request the server walked through the whole catalogue from the first product to the last and counted the ones in range. Then Bazaar appeared on a popular television programme about craftsmanship. Overnight the catalogue grew to its current size and the filter started to be used thousands of times per minute. The server that walked through everything for every request could not keep up, pages froze, and the owners watched their best day of sales slip away.\n\nThey have now exported the catalogue together with a log of **q** requests that shoppers really made, in the order they arrived, and they would like a program that answers all of them far faster than the old server did. Nothing in the catalogue changes while the requests are being answered, and every request is answered on its own, without any connection to the requests before it.",
-      "input": "The first line contains two integers **n** and **q** (1 <= n, q <= 2*10^5). The second line contains n integers a_1, a_2, ..., a_n (1 <= a_i <= 10^9), the prices in no particular order. Each of the next q lines contains two integers **l** and **r** (1 <= l <= r <= 10^9) describing one request.",
-      "output": "For every request, in the given order, print on its own line the number of products whose price is from l to r inclusive.",
-      "samples": [
-        {
-          "input": "5 3\n10 20 20 30 50\n15 25\n20 20\n31 49",
-          "output": "2\n2\n0"
-        },
-        {
-          "input": "1 1\n7\n1 10",
-          "output": "1"
-        }
-      ],
-      "notes": "In the first example the prices are 10, 20, 20, 30 and 50. The range from 15 to 25 contains both products that cost 20, and each of them is counted even though their prices are equal, so the answer is 2. The range from 20 to 20 contains the same two products, because both ends are included. Nothing costs between 31 and 49, so the last answer is 0. In the second example the only product, priced 7, fits in the range from 1 to 10.",
-      "figures": []
+      "memoryLimit": 256
     },
     {
       "id": "B",
-      "name": "Stepping Stones",
       "timeLimit": 1,
-      "memoryLimit": 256,
-      "legend": "Behind the old water mill of Hollow Creek the river is shallow and clear, and a row of **n** stones crosses it from the left bank to the right bank. The millers put the stones there centuries ago, and since then the water has worn them down unevenly, so today stone i, counting from the left bank, rises exactly h_i centimetres above the surface. Every spring the miller's granddaughter wades in with a measuring stick and writes the heights down in whole centimetres, and the frogs of the creek trust her list completely: two stones with the same number are exactly equally high, and a larger number means a strictly higher stone.\n\nThese stones are the favourite playground of the frogs, and the most famous of them is a young frog called Pip. Every evening the other frogs gather on the right bank to watch him cross, and every evening he tries to cross in the most impressive way he can. Pip is proud, and his pride comes with rules he never breaks. He only ever jumps to the right, towards the far bank, because going back would look like fear. His legs are strong enough to carry him over any number of stones, so he never has to land on a neighbouring stone if he does not want to. And he only ever lands on a stone that is strictly higher than the one he is standing on, since landing lower would look like falling and landing on a stone of the same height would look like standing still.\n\nPip begins with one enormous leap from the left bank that can reach any stone he chooses, and when he has had enough he finishes with one last leap from whatever stone he is on to the right bank. These two leaps touch the banks, not stones, so the height rule does not apply to them. The watching frogs are not impressed by speed or distance. They count the stones Pip lands on, including the very first one, and the more stones there are, the louder they cheer. He does not have to start on the first stone or finish on the last one, and the stones he lands on need not be neighbours.\n\nTonight the whole creek has come to watch, and Pip wants to beat his own record. The water level stays the same all evening and no stone moves, so the heights on the granddaughter's list are exactly the heights he will meet. Help him find the largest number of stones he can land on during one crossing without breaking a single one of his rules. The river is wide, and there may be a great many stones.",
-      "input": "The first line contains one integer **n** (1 <= n <= 2*10^5). The second line contains n integers h_1, h_2, ..., h_n (1 <= h_i <= 10^9), the heights from the left bank to the right bank.",
-      "output": "Print one integer, the largest number of stones Pip can land on.",
-      "samples": [
-        {
-          "input": "6\n7 3 5 3 6 2",
-          "output": "3"
-        },
-        {
-          "input": "4\n4 4 4 4",
-          "output": "1"
-        }
-      ],
-      "notes": "In the first example Pip can land on the stones of height 3, 5 and 6, skipping the others. No crossing with four stones exists: the stone of height 7 has nothing higher after it, and among the rest the two stones of height 3 can never both be used while the stone of height 2 comes last. In the second example every stone has height 4, so after the first landing there is never a strictly higher stone to his right, and the answer is 1.",
-      "figures": []
+      "memoryLimit": 256
     },
     {
       "id": "C",
-      "name": "Bird Count",
       "timeLimit": 1,
-      "memoryLimit": 256,
-      "legend": "Maya has watched birds at Lake Serene every weekend for three years, and her method has never changed. She arrives before sunrise, sits on the same wooden bench near the reeds, opens a notebook on her knees and waits. Every time a bird flies past, she writes down the catalogue number of its species, taken from the thick field guide that the birdwatching club gives to all its members. She does not try to recognise individual birds, which would be impossible anyway, so if the same grey heron flies back and forth five times, its species number simply appears in the notebook five times.\n\nToday turned out to be an unusually busy day. A flock of migrating geese stopped at the lake in the morning, the swallows were hunting insects over the water all afternoon, and in the evening a pair of rare kingfishers appeared for a few minutes and caused a small sensation among the other watchers. By the time the sun went down, the notebook held **n** entries, written one after another in the order the birds appeared, and many species were there over and over again.\n\nBefore she goes home, Maya wants to prepare a clean summary for the club's weekly newsletter. The newsletter always begins with the number of different species seen during the day. After that it lists every one of those species together with the number of times it appears in the notebook. The editors are very particular about the order of that list: the species that was seen most often comes first, then the next most frequent one, and so on down to the rarest. Whenever two species were seen exactly the same number of times, the one with the smaller catalogue number is listed first, because that is the order in which the species appear in the club's printed field guide, and the older members refuse to read the newsletter any other way.\n\nDoing this by hand used to take Maya half the evening, and with today's notebook it would take her most of the night. The catalogue numbers are also far from small, since the field guide covers birds from every continent and its numbers go up to a billion. Write the program that produces the summary for her, so that she can catch the last bus home.",
-      "input": "The first line contains one integer **n** (1 <= n <= 2*10^5). The second line contains n integers a_1, a_2, ..., a_n (1 <= a_i <= 10^9), the catalogue numbers in the order they were written.",
-      "output": "On the first line print **d**, the number of different species. Then print d lines, each containing a catalogue number and the number of times it appears, separated by a space, sorted by that count from largest to smallest, and by catalogue number from smallest to largest when counts are equal.",
-      "samples": [
-        {
-          "input": "6\n3 1 3 2 1 3",
-          "output": "3\n3 3\n1 2\n2 1"
-        },
-        {
-          "input": "4\n5 5 5 5",
-          "output": "1\n5 4"
-        }
-      ],
-      "notes": "In the first example species 3 appears three times, species 1 twice and species 2 once, so there are three species and they are listed in that order. In the second example all four entries belong to species 5.",
-      "figures": []
+      "memoryLimit": 256
     },
     {
       "id": "D",
-      "name": "Staircase",
       "timeLimit": 1,
-      "memoryLimit": 256,
-      "legend": "Lina lives on the top floor of a very old building in the centre of the city. The building was put up long before anybody had heard of lifts, and the staircase that leads to her flat has exactly **x** steps. She climbs it several times a day, and a long time ago, to keep it from becoming boring, she turned the climb into a game that her neighbours have learned to recognise by the sound of irregular jumps echoing through the stairwell every morning.\n\nLina never walks up one step at a time. Instead she jumps, and over the years she has settled on a few jump lengths that feel comfortable to her: in a single jump she climbs exactly c_1 steps, or exactly c_2 steps, and so on up to exactly c_n steps. These are the only jumps she ever makes. She may use each of them as many times as she likes during a climb, in any order, and she does not have to use all of them. She always begins on the floor of the entrance hall, which counts as step 0, and every jump starts from the step on which the previous one landed.\n\nThe climb is only finished when she lands exactly on step x. Right after the top step there is the door of her flat and a solid wall, so any jump that would carry her past step x is simply not allowed, and an attempt that gets stuck below the top without any allowed jump left does not count as a way of climbing at all.\n\nLina records every climb as the list of jump lengths in the order she made them, and two climbs are different whenever their lists are different. The order matters: with a staircase of five steps and jumps of two and three, jumping two and then three is one climb and jumping three and then two is another, while jumping two three times is not a climb at all, because the third jump would take her from step four to step six. So that small staircase can be climbed in exactly two ways.\n\nLina studies mathematics, and she has started to wonder how many different ways there are to climb her own staircase. She once tried to write them all down, but she gave up after several pages, because the number grows unbelievably fast as the staircase gets higher. Count them for her. Since the answer can be enormous, print its remainder when divided by 10^9+7, that is, by 1000000007.",
-      "input": "The first line contains two integers **n** and **x** (1 <= n <= 100, 1 <= x <= 10^5). The second line contains n distinct integers c_1, c_2, ..., c_n (1 <= c_i <= 1000), the jump lengths.",
-      "output": "Print one integer, the number of different ways to land exactly on step x, modulo 10^9+7.",
-      "samples": [
-        {
-          "input": "3 9\n2 3 4",
-          "output": "11"
-        },
-        {
-          "input": "2 5\n3 7",
-          "output": "0"
-        }
-      ],
-      "notes": "In the first example there are eleven ways: the six orders of 2, 3 and 4, the four orders of three jumps of 2 and one jump of 3, and three jumps of 3. Jumping 2 four times reaches only step 8, and no allowed jump from there lands on step 9. In the second example a jump of 7 is too long from the start, and two jumps of 3 overshoot step 5, so the answer is 0.",
-      "figures": []
+      "memoryLimit": 256
     },
     {
       "id": "E",
-      "name": "First Words",
       "timeLimit": 1,
-      "memoryLimit": 256,
-      "legend": "In the corner of the university computing lab, behind the printers and under a thick layer of dust, stands the oldest machine in the building. The students call it Old Grey. It was assembled by hand, more than twenty years ago, by the man who founded the lab, and it has outlived every computer that was bought after it. Nobody remembers the last time it was switched off, and nobody dares to switch it off now, because nobody is completely sure it would come back.\n\nLast week the lab lost power during a storm, and Old Grey had to start from scratch. The students who were there that night describe the boot as a small show. First the fans spin up one after another, from the smallest to the largest. Then the machine tests its memory, which is split into sixteen banks of 4096 cells each, writing a pattern of ones and zeros into every cell and reading it back, bank by bank, while a row of lamps on the front panel lights up one lamp per bank. After that it computes a checksum of its own startup program, adding up 65536 numbers and comparing the result with a value burned into a chip years ago. It spins its tape drive forward and back three times to straighten the tape, loads eleven drivers in a fixed order, synchronises its clock with a radio signal, and measures the voltage of each of its four power lines twice, once with every device switched on and once with every device switched off.\n\nIt all looks very impressive, and a group of first year students spent an entire evening trying to understand the numbers. They wrote down the memory patterns, recomputed the checksum on paper and argued for an hour about the order of the drivers. But none of this ever appears on the screen, and none of it matters for what happens next. When every test has passed, the screen stays black for a moment, and then one single line appears in large green letters. It is the first thing the founder of the lab typed into Old Grey on the day he finished building it, and he told the machine to show it every time it wakes up: the word Hello, followed by exactly one space and then his own first name, Yazan, both words starting with a capital letter and nothing else on the line, not even a punctuation mark.\n\nThe students want to put a small tribute to Old Grey on every computer in the lab, and your team has been asked to write it. Your program does not have to test any memory, compute any checksum or load any driver. It only has to do what the students actually saw: show that one line, exactly as Old Grey shows it.",
-      "input": "There is no input.",
-      "output": "Print the single line that Old Grey shows on its screen after it wakes up, exactly as described.",
-      "samples": [
-        {
-          "input": "",
-          "output": "Hello Yazan"
-        }
-      ],
-      "notes": "This is the speed problem: only the first team to solve it gets it. Every letter, space and capital counts, so read carefully before you send.",
-      "figures": []
+      "memoryLimit": 256
     },
     {
       "id": "F",
-      "name": "Formula Check",
       "timeLimit": 1,
-      "memoryLimit": 256,
-      "legend": "Quanta is a calculator app used by millions of students, engineers and accountants, and its best-known feature is that it accepts whole formulas typed in one line, exactly the way people write them on paper. A user can type something like `{2 * [3 + (4 - 1)] - (5 / [1 + 1])}`, press Enter and get the result immediately. That freedom has a price. For months the support team has been receiving bug reports that begin with the words \"your app crashed on my formula\", and when the engineers read a large sample of them by hand, they discovered that nine crashes out of ten had the same cause. The numbers and the operators were fine; the brackets were not. A bracket had been opened and never closed, or closed without ever being opened, or closed in the wrong place.\n\nThe engine inside Quanta is very old and assumes that every formula it receives has correct brackets, and rewriting it would take months, so the team decided to put a small, fast checker in front of it and asked you to write it. A formula may use round brackets `( )`, square brackets `[ ]` and curly brackets `{ }`. The checker throws away every other character and keeps only the brackets, in their original order, so the formula above turns into `{[()]([])}`. You will receive such a sequence of brackets directly.\n\nThe sequence is called balanced when every closing bracket closes a bracket of the same kind that was opened earlier, when the bracket it closes is always the one opened most recently among those still open, and when nothing is left open at the end. So `()` and `([]{})` and `{[()]}` are balanced, while `([)]` is not, because the round bracket is closed while the square bracket opened after it is still open. Neither is `((`, where nothing is ever closed, nor `)(`, whose very first bracket tries to close something that was never opened, nor `(]`, where a square bracket tries to close a round one.\n\nFor a balanced sequence the app also shows its depth. Read the sequence from left to right and keep count of how many brackets are open, adding one for every opening bracket and taking one away for every closing bracket; the depth is the largest value this count ever reaches. For `{[()]([])}` the count climbs to 3, so the depth is 3, while `()[]{}` has depth 1, because its three pairs are never open at the same moment. The designers noticed that people make far more mistakes in deeply nested formulas, and they use the depth to suggest when a formula should be split into smaller parts. Decide whether the given sequence is balanced, and if it is, find its depth.",
-      "input": "The first line contains one integer **n** (1 <= n <= 2*10^5). The second line contains a string of exactly n characters, each of them one of `(` `)` `[` `]` `{` `}`.",
-      "output": "If the sequence is balanced, print YES on the first line and its depth on the second line. Otherwise print NO.",
-      "samples": [
-        {
-          "input": "6\n([]{})",
-          "output": "YES\n2"
-        },
-        {
-          "input": "4\n([)]",
-          "output": "NO"
-        }
-      ],
-      "notes": "In the first example the number of open brackets after each character is 1, 2, 1, 2, 1 and 0, every bracket is closed by its own kind in the right order, and the largest count is 2. In the second example the round bracket is closed while the square bracket is still open, so the answer is NO, even though each kind of bracket is opened and closed exactly once.",
-      "figures": []
+      "memoryLimit": 256
     },
     {
       "id": "G",
-      "name": "Painted Houses",
       "timeLimit": 1,
-      "memoryLimit": 256,
-      "legend": "In the far north of the kingdom lies Endless Street, the longest street anyone has ever built. Its houses stand in a single straight line and are numbered 1, 2, 3 and so on up to **n**, and n is so large that no traveller has ever walked from one end to the other. The street is famous for its houses, which were all left unpainted when they were built, so that from a distance the whole street looks like one long grey ribbon disappearing over the horizon.\n\nThis year the king decided that Endless Street should finally get some colour, and he hired two painters. The first painter is methodical and a little lazy. She starts at the beginning of the street, walks past a houses and paints the a-th house blue, then walks past another a houses and paints that one blue as well, and keeps going like this all the way to the end. In other words, she paints every house whose number can be divided by a without a remainder. The second painter works in exactly the same way, but with his own step of b houses, and he paints yellow every house whose number can be divided by b. The two painters do not talk to each other, so it often happens that both of them arrive at the same house. When that happens the blue and the yellow mix on the walls and the house ends up green, but it is still painted only once as far as the king is concerned.\n\nWhen the work is finished, the king wants to know how many houses on Endless Street received at least one coat of paint, whether blue, yellow or green, so that he can pay the painters' guild the right amount. The royal accountants tried to count the houses one by one, walking along the street with an abacus, but after a few weeks they had covered a tiny fraction of it and gave up. Only a clever idea, not a long walk, can answer the king's question. The guild, for its part, has warned the king that its painters are paid per house and not per coat, so a green house must never be paid for twice, and the king, who does not like to overpay, has promised to check the final number very carefully.\n\nGiven n and the two steps a and b, find the number of houses between 1 and n whose number is divisible by a, by b, or by both.",
-      "input": "The only line contains three integers **n**, **a** and **b** (1 <= n <= 10^18, 1 <= a, b <= 10^9).",
-      "output": "Print one integer, the number of houses that were painted at least once.",
-      "samples": [
-        {
-          "input": "10 2 3",
-          "output": "7"
-        },
-        {
-          "input": "7 7 7",
-          "output": "1"
-        }
-      ],
-      "notes": "In the first example the first painter paints houses 2, 4, 6, 8 and 10 and the second painter paints houses 3, 6 and 9. House 6 is painted by both of them and turns green, but it is counted once, so the painted houses are 2, 3, 4, 6, 8, 9 and 10, seven in total. In the second example both painters use the same step and both paint only house 7, so exactly one house is painted.",
-      "figures": []
+      "memoryLimit": 256
     },
     {
       "id": "H",
-      "name": "Warehouse Escape",
       "timeLimit": 2,
-      "memoryLimit": 256,
-      "legend": "Robot R-7 works the night shift in one of the largest automated warehouses in the country. Every night it rolls between endless rows of shelves, collects parcels, carries them to the loading gates and comes back for more, and until tonight it knew the building by heart. A little after three in the morning a thunderstorm knocked out the main power line for a few seconds. The emergency generator started at once and most machines did not even notice, but R-7 happened to be updating its memory at that exact moment. When it rebooted, its map of the warehouse was gone and its battery was nearly empty, and now it has a single goal, which is to reach its charging dock before the battery dies.\n\nFortunately the control system still has an up-to-date plan of the floor. The floor is divided into equal square cells forming a grid of **n** rows and **m** columns, and every cell is either free floor, marked `.`, or taken by a heavy shelf, marked `#`. The robot is standing on the cell marked `S` and the charging dock is on the cell marked `E`; both of these are free cells, and there is exactly one of each on the plan.\n\nIn one move the robot rolls from its cell to a cell that shares a side with it, directly above, below, to the left or to the right. It cannot move diagonally, it cannot roll onto a shelf, and it cannot leave the grid, which is surrounded by the outer walls of the building. Every move costs the same small amount of battery in any direction, so the battery the robot needs depends only on the number of moves in its route, and it would like to reach the dock using as few moves as possible. The engineers in the control room want just that number. They do not care which route the robot takes when several are equally short, but they do need to know when there is no route at all, because the shelves cannot be moved, and in that case a technician will have to come and carry the robot to the dock by hand.\n\nThe warehouse is enormous, with up to a thousand rows and a thousand columns, and the plan arrives as n lines of text, from the top row to the bottom row, each describing its cells from left to right. Find the smallest number of moves that takes the robot from its starting cell to the dock, or report that the dock cannot be reached.",
-      "input": "The first line contains two integers **n** and **m** (1 <= n, m <= 1000). Each of the next n lines contains a string of m characters, each of them `.`, `#`, `S` or `E`, with exactly one `S` and exactly one `E`.",
-      "output": "Print the minimum number of moves from `S` to `E`, or -1 if the dock cannot be reached.",
-      "samples": [
-        {
-          "input": "4 5\nS..#.\n.#...\n.#.#.\n...#E",
-          "output": "7"
-        },
-        {
-          "input": "3 3\nS#.\n##.\n..E",
-          "output": "-1"
-        }
-      ],
-      "notes": "In the first example one shortest route goes right twice, down once, right twice and down twice, which is 7 moves. The robot could also roll down the left column first and reach the dock after 11 moves, but that route is not the shortest, and the answer is the length of a shortest one. In the second example the robot is boxed in by shelves on its right and below it, so it cannot make a single move and the answer is -1.",
-      "figures": [],
-      "speed": true
+      "memoryLimit": 256
     }
   ],
   "teams": [],
   "submissions": [],
-  "updatedAt": "2026-09-22T10:02:17.765Z"
+  "updatedAt": "2026-09-22T10:06:52.652Z"
 }
